@@ -111,6 +111,7 @@ class Spaceship(GameObject):
         self.laser_sound = load_sound("laser")
         # Make a copy of the original UP vector
         self.direction = Vector2(UP)
+        self.damage = 0
 
         super().__init__(position, load_sprite(ship), Vector2(0))
 
@@ -142,12 +143,17 @@ class Spaceship(GameObject):
         self.create_bullet_callback(bullet)
         self.laser_sound.play()
 
+class Wormhole(GameObject):
+    # Create a random wormhole at a random position in pygame as a sprite
+    def __init__(self, position, sprite, velocity):
+
 
 class NPC(Spaceship):
     def __init__(
         self, position, create_bullet_callback, ship=random.choice(ships), targets=[]
     ):
         self.targets = targets
+        self.damage = 0
 
         super().__init__(position, create_bullet_callback, ship)
 
@@ -178,7 +184,7 @@ class NPC(Spaceship):
                 self.target.position[1] - self.position[1],
             )
 
-            print(self.direction)
+            #print(self.direction)
 
             # distance = self.direction.length()
             # direction.normalize_ip()
@@ -215,10 +221,15 @@ class Asteroid(GameObject):
                 )
                 self.create_asteroid_callback(asteroid)
 
+#bullet = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10"]
+bullet = random.randrange(10, 64, 1)
 
 class Bullet(GameObject):
     def __init__(self, position, velocity):
-        super().__init__(position, load_sprite("bullet1"), velocity)
+        super().__init__(position, load_sprite(f"{bullet}"), velocity)
+        #self.sprite = pygame.transform.scale(self.sprite, (30, 30))
+        #self.sprite = pygame.transform.rotozoom(self.sprite, -90, 0.2)
+
 
     def move(self, surface):
         self.position = self.position + self.velocity

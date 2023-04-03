@@ -1,6 +1,6 @@
 import pygame
 
-from models import Asteroid, Spaceship, NPC
+from models import Asteroid, Spaceship, NPC, Wormhole
 from utils import get_random_position, load_sprite, print_text
 
 
