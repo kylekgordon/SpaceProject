@@ -9,6 +9,12 @@ import math
 import random
 from pygame.math import Vector2
 
+# Color library
+black = (0, 0, 0)
+white = (255, 255, 255)
+red = (255, 0, 0)
+blue = (0, 0, 255)
+green = (0, 255, 0)
 
 # Add the ships to a list
 ships = ["space_ship1", "space_ship2", "space_ship3", "space_ship4", "space_ship5", "space_ship6", "space_ship7", "space_ship8", "space_ship9", "space_ship10"]
@@ -27,12 +33,13 @@ class SpaceRocks:
         self.asteroids = []
         self.bullets = []
         self.spaceship = Spaceship((400, 300), self.bullets.append)
-        self.npc = NPC(
-            (200, 200), self.bullets.append, random.choice(ships), [self.spaceship]
-        )
-
+        # self.npc = []
+        # self.npc.append(NPC(
+        #     (200, 200), self.bullets.append, random.choice(ships), [self.spaceship]
+        # ))
+        self.npc = NPC((200, 200), self.bullets.append, random.choice(ships), [self.spaceship])
         # Griffin changed this to 1 so it would only generate 1 asteroid :)
-        for _ in range(0):
+        for _ in range(1):
             while True:
                 position = get_random_position(self.screen)
                 if (
@@ -47,11 +54,17 @@ class SpaceRocks:
         while True:
             self._handle_input()
             self._process_game_logic()
+            #self._map_scroll()
             self._draw()
+            
 
     def _init_pygame(self):
         pygame.init()
         pygame.display.set_caption("Spacers")
+
+    def _damage_bar(self, damage):
+        pygame.draw.rect(self.background, red,
+        pygame.Rect(10, 10, 100 - damage * 50, 10))
 
     def _handle_input(self):
         for event in pygame.event.get():
@@ -85,10 +98,21 @@ class SpaceRocks:
         if self.spaceship:
             for asteroid in self.asteroids:
                 if asteroid.collides_with(self.spaceship):
-                    self.spaceship = None
-                    self.message = "You lost!"
+                    self.spaceship.damage += 1
+                    print(self.spaceship.damage)
+                    self.asteroids.remove(asteroid)
+                    asteroid.split()
+                    #self.message = "You lost!"
                     break
 
+        # for enemy in self.npc:
+        #     enemy.choose_target()
+        #     enemy.follow_target()
+        #     for asteroid in self.asteroids:
+        #         if asteroid.collides_with(enemy):
+        #             self.npc.remove(enemy)
+        #             break
+                
         if self.npc:
             self.npc.choose_target()
             self.npc.follow_target()
@@ -101,18 +125,23 @@ class SpaceRocks:
                     asteroid.split()
                     break
 
+
         for bullet in self.bullets[:]:
             if not self.screen.get_rect().collidepoint(bullet.position):
                 self.bullets.remove(bullet)
+
+            # if bullet.collides_with(self.npc):
+            #     self.npc = None
+            #     self.bullets.remove(bullet)
 
         # if not self.asteroids and self.spaceship:
         #     self.message = "You won!"
 
     def _draw(self):
-        self.screen.blit(self.background, (0, 0))
-
+        self.screen.blit(self.background, (0,0))
+        self._damage_bar(self.spaceship.damage)
         for game_object in self._get_game_objects():
-            print(game_object)
+            #print(game_object)
             game_object.draw(self.screen)
 
         if self.message:
@@ -131,3 +160,20 @@ class SpaceRocks:
             game_objects.append(self.npc)
 
         return game_objects
+    
+    def _map_scroll(self):
+        # self.spaceship.rect = self.spaceship.get_rect()
+        # self.background.rect = self.background.get_rect()
+        
+        # if self.spaceship.rect.x > self.screen.get_width() / 2:
+        #     self.background.rect.x += self.spaceship.speed
+
+        # if self.spaceship.rect.x < self.screen.get_width() / 2:
+        #     self.background.rect.x -= self.spaceship.speed
+        
+        # if self.spaceship.rect.y > self.screen.get_height() / 2:
+        #     self.background.rect.y += self.spaceship.speed
+
+        # if self.spaceship.rect.y < self.screen.get_height() / 2:
+        #     self.background.rect.y -= self.spaceship.speed
+        pass
