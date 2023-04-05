@@ -9,11 +9,17 @@ import math
 
 UP = Vector2(0, -1)
 
+# Color library
+black = (0, 0, 0)
+white = (255, 255, 255)
+red = (255, 0, 0)
+blue = (0, 0, 255)
+green = (0, 255, 0)
 
 # Add the ships to a list
 ships = ["space_ship1", "space_ship2", "space_ship3", "space_ship4", "space_ship5", "space_ship6", "space_ship7", "space_ship8", "space_ship9", "space_ship10"]
 
-# Animate images
+# Animate images in a list of images
 image_paths = ["sprites/Portal/portal01.png", "sprites/Portal/portal02.png",
                      "sprites/Portal/portal03.png", "sprites/Portal/portal04.png",
                      "sprites/Portal/portal05.png", "sprites/Portal/portal06.png",
@@ -47,8 +53,27 @@ image_paths = ["sprites/Portal/portal01.png", "sprites/Portal/portal02.png",
                      "sprites/Portal/portal61.png", "sprites/Portal/portal62.png",
                      "sprites/Portal/portal63.png", "sprites/Portal/portal64.png"]
 
+explosion_paths = ["sprites/Explosion/1.png", "sprites/Explosion/2.png",
+                    "sprites/Explosion/3.png", "sprites/Explosion/4.png", 
+                    "sprites/Explosion/5.png", "sprites/Explosion/6.png",
+                    "sprites/Explosion/7.png", "sprites/Explosion/8.png",
+                    "sprites/Explosion/9.png", "sprites/Explosion/10.png",
+                    "sprites/Explosion/11.png", "sprites/Explosion/12.png",
+                    "sprites/Explosion/13.png", "sprites/Explosion/14.png",
+                    "sprites/Explosion/15.png", "sprites/Explosion/16.png",
+                    "sprites/Explosion/17.png", "sprites/Explosion/18.png",
+                    "sprites/Explosion/19.png", "sprites/Explosion/20.png",
+                    "sprites/Explosion/21.png", "sprites/Explosion/22.png",
+                    "sprites/Explosion/23.png", "sprites/Explosion/24.png",
+                    "sprites/Explosion/25.png", "sprites/Explosion/26.png",
+                    "sprites/Explosion/27.png", "sprites/Explosion/28.png",
+                    "sprites/Explosion/29.png", "sprites/Explosion/30.png"]
+
 # Choose a random bullet sprite
 bullet = random.randrange(10, 66, 1)
+
+current_image = 0
+current_image_2 = 0
 
 class GameObject:
     def __init__(self, position, sprite, velocity):
@@ -224,7 +249,6 @@ class NPC(Spaceship):
     def remove(self):
         pass
 
-
 class Asteroid(GameObject):
     def __init__(self, position, create_asteroid_callback, size=3):
         self.create_asteroid_callback = create_asteroid_callback
@@ -260,6 +284,7 @@ class Bullet(GameObject):
 class Wormhole(GameObject):
     
     def __init__(self, position, screen, image_paths = image_paths):
+        
         # Load images as surfaces
         images = [pygame.image.load(path).convert_alpha() for path in image_paths]
 
@@ -268,11 +293,78 @@ class Wormhole(GameObject):
         sprite.image = images[0]
         sprite.rect = sprite.image.get_rect()
 
+        self.screen = screen
+        self.position = position
         # Call the superclass constructor
-        for i in range(0, 64):
-            wormhole = images[i]
-            wormhole = pygame.transform.scale(wormhole, (200, 150))
-            screen.blit(wormhole, position)
-            pygame.display.update()
+        #for i in range(0, 64):
+            #wormhole = images[i]
+            #wormhole = pygame.transform.scale(wormhole, (200, 150))
+            #screen.blit(wormhole, position)
+
+
     def update(self):
-        pass
+        global current_image
+        current_image_path = image_paths[current_image]
+        current_image_surface = pygame.image.load(current_image_path)
+        current_image_surface = pygame.transform.scale(current_image_surface, (200, 150))
+        self.screen.blit(current_image_surface, self.position)
+
+        current_image += 1
+        if current_image >= len(image_paths):
+            current_image = 0
+
+        pygame.display.update()
+        # pass
+
+class Damage_bar():
+    def __init__(self, screen, damage):
+        self.damage = damage
+        self.damage_bar_width = 100
+        self.damage_bar_height = 10
+        self.background = screen
+        #damage_bar_surface = pygame.Surface((damage_bar_width - damage, damage_bar_height))
+        # self.damage_bar_rect = pygame.Rect(10, 10, damage_bar_width - damage, damage_bar_height)
+
+    def draw(self, damage):
+        damage_bar_rect = pygame.Rect(10, 10, self.damage_bar_width - damage, self.damage_bar_height)
+        pygame.draw.rect(self.background, red, damage_bar_rect)
+    
+        # damage_bar_rect.width = int(damage_bar_width - damage)
+        # pygame.draw.rect(self.background, red, damage_bar_rect)
+
+        pygame.display.update()
+    # self.image = pygame.draw.rect(self.background, red, pygame.Rect(10, 10, 10 * damage, 10))
+
+class Explosion(GameObject):
+    
+    def __init__(self, position, screen, targets=[], explosion_paths = explosion_paths):
+        
+        # Load images as surfaces
+        # images = [pygame.image.load(path).convert_alpha() for path in explosion_paths]
+
+        # # Create sprite object and set initial image
+        # sprite = pygame.sprite.Sprite()
+        # sprite.image = images[0]
+        # sprite.rect = sprite.image.get_rect()
+        self.targets = targets
+        self.screen = screen
+        self.position = position
+        # Call the superclass constructor
+        #for i in range(0, 64):
+            #wormhole = images[i]
+            #wormhole = pygame.transform.scale(wormhole, (200, 150))
+            #screen.blit(wormhole, position)
+
+
+    def update(self, pos):
+        global current_image_2
+        current_image_path = explosion_paths[current_image_2]
+        current_image_surface = pygame.image.load(current_image_path)
+        #current_image_surface = pygame.transform.scale(current_image_surface, (200, 150))
+        self.screen.blit(current_image_surface, pos)
+
+        current_image_2 += 1
+        if current_image_2 >= len(image_paths):
+            current_image_2 = 0
+
+        pygame.display.update()

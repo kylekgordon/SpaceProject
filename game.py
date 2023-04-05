@@ -1,6 +1,6 @@
 import pygame
 
-from models import Asteroid, Spaceship, NPC, Wormhole
+from models import Asteroid, Spaceship, NPC, Wormhole, Damage_bar, Explosion
 from utils import get_random_position, load_sprite, print_text, load_sound
 
 
@@ -67,15 +67,20 @@ class SpaceRocks:
 
         self.hit = load_sound("DefiniteHit")
         self.explosion = load_sound("MiniExplosionChainReaction")
+        self.taunt = load_sound("Funny-16")
+
+        
 
         self.asteroids = []
         self.bullets = []
         self.spaceship = Spaceship((400, 300), self.bullets.append)
-        self.wormhole = Wormhole((random.randrange(10, 790, 1), random.randrange(10, 790, 1)), self.background)
+        self.wormhole = Wormhole((random.randrange(100, 700, 1), random.randrange(100, 700, 1)), self.background)
+        self.damage_bar = Damage_bar(self.background, self.spaceship.damage)
         # self.npc = []
         # self.npc.append(NPC(
         #     (200, 200), self.bullets.append, random.choice(ships), [self.spaceship]
         # ))
+        self.explode = Explosion(self.spaceship.position, self.background, [self.spaceship])
         self.npc = NPC((random.randrange(10, 790, 1), random.randrange(10, 790, 1)), self.bullets.append, random.choice(ships), [self.spaceship])
         # Griffin changed this to 1 so it would only generate 1 asteroid :)
         for _ in range(2):
@@ -113,18 +118,6 @@ class SpaceRocks:
         pygame.init()
         pygame.display.set_caption("Spacers")
 
-    def _damage_bar(self, damage):
-        damage_bar_width = 100
-        damage_bar_height = 10
-        #damage_bar_surface = pygame.Surface((damage_bar_width - damage, damage_bar_height))
-        damage_bar_rect = pygame.Rect(10, 10, damage_bar_width - damage, damage_bar_height)
-
-        damage_bar_rect.width = int(damage_bar_width - damage)
-        pygame.draw.rect(self.background, red, damage_bar_rect)
-
-        pygame.display.update()
-        # self.image = pygame.draw.rect(self.background, red, pygame.Rect(10, 10, 10 * damage, 10))
-
     def _handle_input(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT or (
@@ -161,11 +154,12 @@ class SpaceRocks:
                     self.hit.play()
                     self.spaceship.damage += 1
                     print(self.spaceship.damage)
-                    self._damage_bar(self.spaceship.damage*10)
+                    self.damage_bar.draw(self.spaceship.damage*10)
                     self.asteroids.remove(asteroid)
                     asteroid.split()
                     if self.spaceship.damage == 10:
                         self.spaceship = None
+                        self.explode.update(self.spaceship.position)
                         self.explosion.play()
                         self.message = "You lost!"
                     #self.message = "You lost!"
@@ -185,6 +179,7 @@ class SpaceRocks:
             #self.npc.shoot()
 
         if self.wormhole:
+            self.taunt.play()
             self.wormhole.update()
 
         for bullet in self.bullets[:]:
