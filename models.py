@@ -276,8 +276,6 @@ class Bullet(GameObject):
         self.sprite = pygame.transform.rotozoom(self.sprite, angle, 0.3)
         self.radius = self.sprite.get_width() / 2
         
-
-
     def move(self, surface):
         self.position = self.position + self.velocity
 
@@ -285,36 +283,31 @@ class Wormhole(GameObject):
     
     def __init__(self, position, screen, image_paths = image_paths):
         
+        
         # Load images as surfaces
         images = [pygame.image.load(path).convert_alpha() for path in image_paths]
 
         # Create sprite object and set initial image
         sprite = pygame.sprite.Sprite()
         sprite.image = images[0]
-        sprite.rect = sprite.image.get_rect()
+        sprite.image = pygame.transform.scale(sprite.image, (400, 300))
+        #sprite.rect = sprite.image.get_rect()
 
         self.screen = screen
         self.position = position
-        # Call the superclass constructor
-        #for i in range(0, 64):
-            #wormhole = images[i]
-            #wormhole = pygame.transform.scale(wormhole, (200, 150))
-            #screen.blit(wormhole, position)
 
+        super().__init__(position, sprite.image, Vector2(0))
 
     def update(self):
         global current_image
         current_image_path = image_paths[current_image]
         current_image_surface = pygame.image.load(current_image_path)
         current_image_surface = pygame.transform.scale(current_image_surface, (200, 150))
-        self.screen.blit(current_image_surface, self.position)
+        self.screen.blit(current_image_surface, (self.position))
 
         current_image += 1
         if current_image >= len(image_paths):
             current_image = 0
-
-        pygame.display.update()
-        # pass
 
 class Damage_bar():
     def __init__(self, surface):
@@ -346,12 +339,12 @@ class Explosion(GameObject):
     def __init__(self, position, screen, targets=[], explode_paths = explosion_paths):
         
         # Load images as surfaces
-        # images = [pygame.image.load(path).convert_alpha() for path in explosion_paths]
+        images = [pygame.image.load(path).convert_alpha() for path in explode_paths]
 
-        # # Create sprite object and set initial image
-        # sprite = pygame.sprite.Sprite()
-        # sprite.image = images[0]
-        # sprite.rect = sprite.image.get_rect()
+        # Create sprite object and set initial image
+        sprite = pygame.sprite.Sprite()
+        sprite.image = images[0]
+        sprite.rect = sprite.image.get_rect()
 
         self.targets = targets
         self.screen = screen
@@ -363,15 +356,13 @@ class Explosion(GameObject):
             #screen.blit(wormhole, position)
 
 
-    def update(self, pos, explode_paths = explosion_paths):
+    def update(self, pos):
         global current_image_2
-        #current_image_path = explode_paths[current_image_2]
-        #current_image_surface = pygame.image.load(current_image_path)
-        #current_image_surface = pygame.transform.scale(current_image_surface, (200, 150))
-        self.screen.blit(pygame.image.load(explode_paths[current_image_2]), pos)
+        current_image_path = explosion_paths[current_image_2]
+        current_image_surface = pygame.image.load(current_image_path)
+        current_image_surface = pygame.transform.scale(current_image_surface, (200, 150))
+        self.screen.blit(current_image_surface, pos)
 
         current_image_2 += 1
         if current_image_2 >= len(explosion_paths):
             current_image_2 = 0
-
-        pygame.display.update()

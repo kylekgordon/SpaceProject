@@ -18,6 +18,10 @@ green = (0, 255, 0)
 
 time_elapse = 1000
 
+pygame.mixer.init()
+
+pygame.mixer.music.load("sounds/song21.wav")
+
 # Add the ships to a list
 ships = ["space_ship1", "space_ship2", "space_ship3", "space_ship4", "space_ship5", "space_ship6", "space_ship7", "space_ship8", "space_ship9", "space_ship10"]
 display_time = 1000  # Time in milliseconds to display each image
@@ -68,11 +72,14 @@ class Spacers:
         self.hit = load_sound("DefiniteHit")
         self.explosion = load_sound("MiniExplosionChainReaction")
         self.taunt = load_sound("Funny-16")
+        #self.song = pygame.mixer.music.load("sounds/song21.wav")
+        pygame.mixer.music.play(-1)
 
         self.asteroids = []
         self.bullets = []
+        self.blackholes = []
         self.spaceship = Spaceship((400, 300), self.bullets.append)
-        self.wormhole = Wormhole((random.randrange(100, 700, 1), random.randrange(100, 700, 1)), self.background)
+        #self.wormhole = Wormhole((random.randrange(100, 700, 1), random.randrange(100, 500, 1)), self.background)
         self.damage_bar = Damage_bar(self.background)
         # self.npc = []
         # self.npc.append(NPC(
@@ -92,6 +99,9 @@ class Spacers:
                     break
 
             self.asteroids.append(Asteroid(position, self.asteroids.append))
+        
+        if len(self.blackholes) == 0:
+            self.blackholes.append(Wormhole((random.randrange(100, 700, 1), random.randrange(100, 500, 1)), self.background))
 
     def main_loop(self):
         global time_elapse
@@ -100,20 +110,29 @@ class Spacers:
             self._process_game_logic()
             self._draw()
             #Wormhole(self.background)
-            # time_elapse -= 1
-            # if time_elapse == 0:
-            #     Wormhole(self.screen, "True")
-            #     time_elapse = 1000
-            # else:
-            #     Wormhole(self.screen, False)
-            # Animate images
-            
-            # self.animate_images(image_paths, 10, self.screen)
-            # for path in wormhole_path:
-            #     self.display_image(path, display_time,self.background)
+            time_elapse -= 1
+
+            for wormhole in self.blackholes:
+                #print(wormhole)
+                if time_elapse == 0:
+                    if wormhole.collides_with(self.spaceship):
+                        self.spaceship.damage += 1
+                        self.damage_bar.update(self.spaceship.damage)
+                        #self.blackholes.remove(wormhole)
+                        #self.blackholes.append(Wormhole((random.randrange(100, 700, 1), random.randrange(100, 500, 1)), self.background))
+                        time_elapse = 1000
+                        break
+                    time_elapse = 1000
+                else:
+                    wormhole.update()
+                    print(time_elapse//100)
+
+
 
     def _init_pygame(self):
+
         pygame.init()
+        
         pygame.display.set_caption("Spacers")
 
     def _handle_input(self):
@@ -148,8 +167,9 @@ class Spacers:
 
         if self.spaceship:
             self.damage_bar.update(self.spaceship.damage)
+            self.explode
             for asteroid in self.asteroids:
-                
+                #print(asteroid)
                 if asteroid.collides_with(self.spaceship):
                     self.hit.play()
                     self.spaceship.damage += 10
@@ -165,6 +185,14 @@ class Spacers:
                     #self.message = "You lost!"
                     break
 
+            for wormhole in self.blackholes:
+                if time_elapse == 0:
+                    if wormhole.collides_with(self.spaceship):
+                        self.spaceship.damage += 10
+                        self.damage_bar.update(self.spaceship.damage)
+
+                    break
+
         # for enemy in self.npc:
         #     enemy.choose_target()
         #     enemy.follow_target()
@@ -177,9 +205,18 @@ class Spacers:
             self.npc.choose_target()
             self.npc.follow_target()
             #self.npc.shoot()
+        
+        # for worm in self.blackholes:
+        #     # if worm.collides_with(self.spaceship):
+        #     #     self.spaceship = None
+        #     #     self.message = "You lost!"
+        #     #     break
+        #         pass
 
-        if self.wormhole:
-            self.wormhole.update()
+        
+
+        # if self.wormhole:
+        #     self.wormhole.update()
             #self.explode.update(self.wormhole.position)
 
         for bullet in self.bullets[:]:
@@ -253,12 +290,3 @@ class Spacers:
         # if self.spaceship.rect.y < self.screen.get_height() / 2:
         #     self.background.rect.y -= self.spaceship.speed
         pass
-
-    # def display_image(self, image_path, display_time, screen):
-    #     # Load image
-    #     image = pygame.image.load(image_path).convert_alpha()
-
-    #     # Display image
-    #     screen.blit(image, (300, 200))
-    #     pygame.display.update()
-    #     pygame.time.delay(display_time)
