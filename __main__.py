@@ -1,6 +1,6 @@
-from game import SpaceRocks
+from game import Spacers
 
 
 if __name__ == "__main__":
-    space_rocks = SpaceRocks()
+    space_rocks = Spacers()
     space_rocks.main_loop()

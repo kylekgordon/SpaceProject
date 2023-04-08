@@ -54,7 +54,7 @@ wormhole_path = ["sprites/Portal/portal01.png", "sprites/Portal/portal02.png",
                         "sprites/Portal/portal61.png", "sprites/Portal/portal62.png",
                         "sprites/Portal/portal63.png", "sprites/Portal/portal64.png"]
 
-class SpaceRocks:
+class Spacers:
     MIN_ASTEROID_DISTANCE = 250
 
     def __init__(self):
@@ -69,19 +69,18 @@ class SpaceRocks:
         self.explosion = load_sound("MiniExplosionChainReaction")
         self.taunt = load_sound("Funny-16")
 
-        
-
         self.asteroids = []
         self.bullets = []
         self.spaceship = Spaceship((400, 300), self.bullets.append)
         self.wormhole = Wormhole((random.randrange(100, 700, 1), random.randrange(100, 700, 1)), self.background)
-        self.damage_bar = Damage_bar(self.background, self.spaceship.damage)
+        self.damage_bar = Damage_bar(self.spaceship.damage)
         # self.npc = []
         # self.npc.append(NPC(
         #     (200, 200), self.bullets.append, random.choice(ships), [self.spaceship]
         # ))
         self.explode = Explosion(self.spaceship.position, self.background, [self.spaceship])
         self.npc = NPC((random.randrange(10, 790, 1), random.randrange(10, 790, 1)), self.bullets.append, random.choice(ships), [self.spaceship])
+
         # Griffin changed this to 1 so it would only generate 1 asteroid :)
         for _ in range(2):
             while True:
@@ -154,7 +153,8 @@ class SpaceRocks:
                     self.hit.play()
                     self.spaceship.damage += 1
                     print(self.spaceship.damage)
-                    self.damage_bar.draw(self.spaceship.damage*10)
+                    #self.damage_bar.draw(self.background, self.spaceship.damage*10)
+                    #self.damage_bar.update(self.background)
                     self.asteroids.remove(asteroid)
                     asteroid.split()
                     if self.spaceship.damage == 10:
@@ -213,6 +213,7 @@ class SpaceRocks:
         if self.message:
             print_text(self.screen, self.message, self.font)
 
+        self.damage_bar.draw(self.background, self.spaceship.damage*10)
         pygame.display.flip()
         self.clock.tick(60)
 
