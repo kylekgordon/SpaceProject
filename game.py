@@ -158,8 +158,9 @@ class SpaceRocks:
                     self.asteroids.remove(asteroid)
                     asteroid.split()
                     if self.spaceship.damage == 10:
-                        self.spaceship = None
                         self.explode.update(self.spaceship.position)
+                        
+                        self.spaceship = None
                         self.explosion.play()
                         self.message = "You lost!"
                     #self.message = "You lost!"
@@ -179,8 +180,8 @@ class SpaceRocks:
             #self.npc.shoot()
 
         if self.wormhole:
-            self.taunt.play()
             self.wormhole.update()
+            #self.explode.update(self.wormhole.position)
 
         for bullet in self.bullets[:]:
             for asteroid in self.asteroids[:]:

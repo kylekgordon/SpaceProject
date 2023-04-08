@@ -337,7 +337,7 @@ class Damage_bar():
 
 class Explosion(GameObject):
     
-    def __init__(self, position, screen, targets=[], explosion_paths = explosion_paths):
+    def __init__(self, position, screen, targets=[], explode_paths = explosion_paths):
         
         # Load images as surfaces
         # images = [pygame.image.load(path).convert_alpha() for path in explosion_paths]
@@ -346,6 +346,7 @@ class Explosion(GameObject):
         # sprite = pygame.sprite.Sprite()
         # sprite.image = images[0]
         # sprite.rect = sprite.image.get_rect()
+
         self.targets = targets
         self.screen = screen
         self.position = position
@@ -356,15 +357,15 @@ class Explosion(GameObject):
             #screen.blit(wormhole, position)
 
 
-    def update(self, pos):
+    def update(self, pos, explode_paths = explosion_paths):
         global current_image_2
-        current_image_path = explosion_paths[current_image_2]
-        current_image_surface = pygame.image.load(current_image_path)
+        #current_image_path = explode_paths[current_image_2]
+        #current_image_surface = pygame.image.load(current_image_path)
         #current_image_surface = pygame.transform.scale(current_image_surface, (200, 150))
-        self.screen.blit(current_image_surface, pos)
+        self.screen.blit(pygame.image.load(explode_paths[current_image_2]), pos)
 
         current_image_2 += 1
-        if current_image_2 >= len(image_paths):
+        if current_image_2 >= len(explosion_paths):
             current_image_2 = 0
 
         pygame.display.update()
