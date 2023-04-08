@@ -317,33 +317,29 @@ class Wormhole(GameObject):
         # pass
 
 class Damage_bar():
-    def __init__(self, damage):
+    def __init__(self, surface):
         super().__init__()
-        self.damage = damage
-        self.damage_bar_width = 100
+        self.damage_bar_width = 0
         self.damage_bar_height = 10
-        #self.background = screen
-        #self.damage_bar_rect = pygame.Rect(10, 10, self.damage_bar_width, self.damage_bar_height)
-        #damage_bar_surface = pygame.Surface((damage_bar_width - damage, damage_bar_height))
-        # self.damage_bar_rect = pygame.Rect(10, 10, damage_bar_width - damage, damage_bar_height)
-
-    def draw(self, surface, damage):
-        width = self.damage_bar_width - damage
+        self.font = pygame.font.SysFont("Arial", 15)
+        self.surface = surface
         # damage_bar_surface = pygame.Surface((width, self.damage_bar_rect.height))
         # damage_bar_surface.fill(red)
         #pygame.draw.rect(self.background, red, damage_bar_rect)
-        pygame.draw.rect(surface, red, (10, 10, width, self.damage_bar_height))
+        
         # damage_bar_rect.width = int(damage_bar_width - damage)
         # pygame.draw.rect(self.background, red, damage_bar_rect)
         #surface.blit(damage_bar_surface,(10, 10))
         #surface.blit(surface, (10, 10))
-        pygame.display.update()
     # self.image = pygame.draw.rect(self.background, red, pygame.Rect(10, 10, 10 * damage, 10))
 
-    def update(self, surface):
-
+    def update(self, damage):
+        width = self.damage_bar_width + damage
+        pygame.draw.rect(self.surface, red, (10, 28, width, self.damage_bar_height))
+        pygame.draw.rect(self.surface, white, (10, 28, 100, self.damage_bar_height), 2)
+        damage_text = self.font.render("Damage" , True, white)
+        self.surface.blit(damage_text, (10, 5))
         pygame.display.update()
-
 
 class Explosion(GameObject):
     

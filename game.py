@@ -73,7 +73,7 @@ class Spacers:
         self.bullets = []
         self.spaceship = Spaceship((400, 300), self.bullets.append)
         self.wormhole = Wormhole((random.randrange(100, 700, 1), random.randrange(100, 700, 1)), self.background)
-        self.damage_bar = Damage_bar(self.spaceship.damage)
+        self.damage_bar = Damage_bar(self.background)
         # self.npc = []
         # self.npc.append(NPC(
         #     (200, 200), self.bullets.append, random.choice(ships), [self.spaceship]
@@ -98,7 +98,6 @@ class Spacers:
         while True:
             self._handle_input()
             self._process_game_logic()
-            #self._map_scroll()
             self._draw()
             #Wormhole(self.background)
             # time_elapse -= 1
@@ -148,18 +147,18 @@ class Spacers:
             game_object.move(self.screen)
 
         if self.spaceship:
+            self.damage_bar.update(self.spaceship.damage)
             for asteroid in self.asteroids:
+                
                 if asteroid.collides_with(self.spaceship):
                     self.hit.play()
-                    self.spaceship.damage += 1
-                    print(self.spaceship.damage)
-                    #self.damage_bar.draw(self.background, self.spaceship.damage*10)
-                    #self.damage_bar.update(self.background)
+                    self.spaceship.damage += 10
+                    #pygame.draw.rect(self.background, red, (10, 10, self.spaceship.damage, 10))
+                    self.damage_bar.update(self.spaceship.damage)
                     self.asteroids.remove(asteroid)
                     asteroid.split()
-                    if self.spaceship.damage == 10:
+                    if self.spaceship.damage == 100:
                         self.explode.update(self.spaceship.position)
-                        
                         self.spaceship = None
                         self.explosion.play()
                         self.message = "You lost!"
@@ -213,7 +212,6 @@ class Spacers:
         if self.message:
             print_text(self.screen, self.message, self.font)
 
-        self.damage_bar.draw(self.background, self.spaceship.damage*10)
         pygame.display.flip()
         self.clock.tick(60)
 
