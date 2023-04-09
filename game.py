@@ -110,23 +110,7 @@ class Spacers:
             self._process_game_logic()
             self._draw()
             #Wormhole(self.background)
-            time_elapse -= 1
-
-            for wormhole in self.blackholes:
-                #print(wormhole)
-                if time_elapse == 0:
-                    if wormhole.collides_with(self.spaceship):
-                        self.spaceship.damage += 1
-                        self.damage_bar.update(self.spaceship.damage)
-                        #self.blackholes.remove(wormhole)
-                        #self.blackholes.append(Wormhole((random.randrange(100, 700, 1), random.randrange(100, 500, 1)), self.background))
-                        time_elapse = 1000
-                        break
-                    time_elapse = 1000
-                else:
-                    wormhole.update()
-                    print(time_elapse//100)
-
+            
 
 
     def _init_pygame(self):
@@ -167,31 +151,40 @@ class Spacers:
 
         if self.spaceship:
             self.damage_bar.update(self.spaceship.damage)
-            self.explode
-            for asteroid in self.asteroids:
-                #print(asteroid)
-                if asteroid.collides_with(self.spaceship):
-                    self.hit.play()
-                    self.spaceship.damage += 10
-                    #pygame.draw.rect(self.background, red, (10, 10, self.spaceship.damage, 10))
-                    self.damage_bar.update(self.spaceship.damage)
-                    self.asteroids.remove(asteroid)
-                    asteroid.split()
-                    if self.spaceship.damage == 100:
-                        self.explode.update(self.spaceship.position)
-                        self.spaceship = None
-                        self.explosion.play()
-                        self.message = "You lost!"
-                    #self.message = "You lost!"
-                    break
-
+            global time_elapse
+            time_elapse -= 1           
             for wormhole in self.blackholes:
                 if time_elapse == 0:
                     if wormhole.collides_with(self.spaceship):
-                        self.spaceship.damage += 10
+                        self.spaceship.damage += 5
                         self.damage_bar.update(self.spaceship.damage)
+                        #self.blackholes.remove(wormhole)
+                        #self.blackholes.append(Wormhole((random.randrange(100, 700, 1), random.randrange(100, 500, 1)), self.background))
+                        time_elapse = 1000
+                        break
+                    time_elapse = 1000
+                
+                wormhole.update()
+                print(time_elapse//100)
+                for asteroid in self.asteroids:
+                    if asteroid.collides_with(self.spaceship):
+                        self.hit.play()
+                        self.spaceship.damage += 10
+                        #pygame.draw.rect(self.background, red, (10, 10, self.spaceship.damage, 10))
+                        self.damage_bar.update(self.spaceship.damage)
+                        self.asteroids.remove(asteroid)
+                        asteroid.split()
+                        if self.spaceship.damage == 100:
+                            self.explode.update(self.spaceship.position)
+                            self.spaceship = None
+                            self.explosion.play()
+                            self.message = "You lost!"
+                        #self.message = "You lost!"
+                        break
 
-                    break
+
+
+                    
 
         # for enemy in self.npc:
         #     enemy.choose_target()
