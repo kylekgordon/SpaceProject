@@ -218,8 +218,8 @@ class NPC(Spaceship):
             self.laser_sound.play()
 
     def damage_bar(self, screen):
-        pygame.draw.rect(screen, (255, 0, 0), (self.position.x - 50, self.position.y - 60, 100, 10))
-        pygame.draw.rect(screen, (0, 255, 0), (self.position.x - 50, self.position.y - 60, 100 - self.damage, 10))
+        pygame.draw.rect(screen, (red), (self.position.x - 50, self.position.y - 60, 100, 10))
+        pygame.draw.rect(screen, (green), (self.position.x - 50, self.position.y - 60, 100 - self.damage, 10))
         #screen.blit(current_image, (self.position.x - 50, self.position.y - 60))
 
     def remove(self):

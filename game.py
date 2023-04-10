@@ -16,7 +16,7 @@ red = (255, 0, 0)
 blue = (0, 0, 255)
 green = (0, 255, 0)
 
-time_elapse = 200
+time_elapse = 500
 
 pygame.mixer.init()
 
@@ -42,20 +42,16 @@ class Spacers:
         self.taunt = load_sound("Funny-16")
         #self.song = pygame.mixer.music.load("sounds/song21.wav")
         pygame.mixer.music.play(-1)
-
+        self.targets = []
         self.asteroids = []
         self.bullets = []
         self.blackholes = []
         self.spaceship = Spaceship((400, 300), self.bullets.append)
         self.wormhole2 = Wormhole2(self.screen)
         self.damage_bar = Damage_bar(self.background)
-        # self.npc = []
-        # self.npc.append(NPC(
-        #     (200, 200), self.bullets.append, random.choice(ships), [self.spaceship]
-        # ))
         self.explode = Explosion(self.spaceship.position, self.background, [self.spaceship])
-        self.npc = NPC((random.randrange(10, 790, 1), random.randrange(10, 790, 1)), self.bullets.append, random.choice(ships), [self.spaceship])
-
+        self.npc = NPC((random.randrange(10, 790, 1), random.randrange(10, 790, 1)), self.bullets.append, random.choice(ships), self.targets)
+        self.enemies = []
         # Griffin changed this to 1 so it would only generate 1 asteroid :)
         for _ in range(2):
             while True:
@@ -68,8 +64,13 @@ class Spacers:
 
             self.asteroids.append(Asteroid(position, self.asteroids.append))
         
-        if len(self.blackholes) == 0:
-            self.blackholes.append(Wormhole1(self.screen))
+        # if len(self.blackholes) == 0:
+        #     self.blackholes.append(Wormhole1(self.screen))
+
+        if len(self.enemies) == 0:
+            #self.targets.append(self.npc)
+            self.targets.append(self.spaceship)
+            self.enemies.append(NPC((random.randrange(10, 790, 1), random.randrange(10, 790, 1)), self.bullets.append, random.choice(ships), self.targets))
 
     def main_loop(self, status):
         global time_elapse
@@ -78,25 +79,15 @@ class Spacers:
             self._handle_input()
             self._process_game_logic()
             self._draw()
-            #Wormhole(self.background)
-            # time_elapse -= 1
+        
+            time_elapse -= 1
 
-            # for wormhole in self.blackholes:
-            #     #print(wormhole)
-            #     if time_elapse == 0:
-            #         if wormhole.collides_with(self.spaceship):
-            #             self.spaceship.damage += 1
-            #             self.damage_bar.update(self.spaceship.damage)
-            #             #self.blackholes.remove(wormhole)
-            #             #self.blackholes.append(Wormhole((random.randrange(100, 700, 1), random.randrange(100, 500, 1)), self.background))
-            #             time_elapse = 1000
-            #             break
-            #         time_elapse = 1000
-            #     else:
-            #         wormhole.update()
-            #         print(time_elapse//100)
-
-
+            if time_elapse == 0 and self.message != "You Won!" and self.message != "You lost!":
+                # if len(self.enemies) == 0:
+                #     self.targets.append(self.spaceship)
+                #     self.targets.append(self.npc)
+                self.enemies.append(NPC((random.randrange(10, 790, 1), random.randrange(10, 790, 1)), self.bullets.append, random.choice(ships), self.targets))
+                time_elapse = 500
 
     def _init_pygame(self):
 
@@ -156,39 +147,48 @@ class Spacers:
                         self.spaceship = None
                         self.explosion.play()
                         self.message = "You lost!"
-                #self.message = "You lost!"
 
-            # for wormhole in self.blackholes:
-            #     if time_elapse == 0:
-            #         if wormhole.collides_with(self.spaceship):
-            #             self.spaceship.damage += 10
-            #             self.damage_bar.update(self.spaceship.damage)
-
-            #         break
-                
-        if self.npc:
-            self.npc.choose_target()
-            self.npc.follow_target()
-            self.npc.shoot()
-            if self.npc.damage >= 100:
-                    self.npc = None
+        for enemy in self.enemies:
+            enemy.choose_target()
+            enemy.follow_target()
+            enemy.shoot()
+            if len(self.enemies) > 0:
+                if enemy.damage >= 100:
+                    self.enemies.remove(enemy)
                     self.explosion.play()
-            if self.npc is not None:
-                for asteroid in self.asteroids:
-                    #print(asteroid)
-                    if self.npc.collides_with(asteroid):
-                        self.hit.play()
-                        self.npc.damage += 10
-                        self.asteroids.remove(asteroid)
-                        asteroid.split()
-                        break
+                if len(self.enemies) > 0:
+                    for asteroid in self.asteroids:
+                        if enemy.collides_with(asteroid):
+                            self.hit.play()
+                            enemy.damage += 10
+                            self.asteroids.remove(asteroid)
+                            asteroid.split()
 
-                    elif self.npc.damage >= 100:
-                        self.npc = None
-                        self.explosion.play()
-                        #self.message = "You Won!"
+                        # elif enemy.damage >= 100:
+                        #     self.enemies.remove(enemy)
+                        #     self.explosion.play()
                 
-                    break
+        # if self.npc:
+        #     self.npc.choose_target()
+        #     self.npc.follow_target()
+        #     self.npc.shoot()
+        #     if self.npc.damage >= 100:
+        #             self.npc = None
+        #             self.explosion.play()
+        #     if self.npc is not None:
+        #         for asteroid in self.asteroids:
+        #             if self.npc.collides_with(asteroid):
+        #                 self.hit.play()
+        #                 self.npc.damage += 10
+        #                 self.asteroids.remove(asteroid)
+        #                 asteroid.split()
+        #                 break
+
+        #             elif self.npc.damage >= 100:
+        #                 self.npc = None
+        #                 self.explosion.play()
+                
+        #             break
                 
         
         if self.wormhole2:
@@ -217,19 +217,30 @@ class Spacers:
             if not self.screen.get_rect().collidepoint(bullet.position):
                 self.bullets.remove(bullet)
 
-            if bullet.belongTo == "player" and bullet.collides_with(self.npc):
-                self.npc.damage += 5
-                self.hit.play()
-                self.bullets.remove(bullet)
-                break
+            # if bullet.belongTo == "player" and bullet.collides_with(self.npc):
+            #     self.npc.damage += 5
+            #     self.hit.play()
+            #     self.bullets.remove(bullet)
+            #     break
 
             if self.spaceship and bullet.belongTo == "npc" and bullet.collides_with(self.spaceship):
                 self.spaceship.damage += 5
                 self.hit.play()
                 self.bullets.remove(bullet)
 
-        if not self.npc and self.spaceship:
-            self.message = "You won!"
+        for bullet in self.bullets[:]:
+            for enemy in self.enemies[:]:
+                if bullet.belongTo == "player" and bullet.collides_with(enemy):
+                    enemy.damage += 5
+                    self.hit.play()
+                    self.bullets.remove(bullet)
+                    break
+
+        if len(self.enemies) == 0:
+            self.message = "You Won!"
+
+        # if not self.npc and self.spaceship:
+        #     self.message = "You won!"
 
     def _draw(self):
         global time_elapse
@@ -241,8 +252,12 @@ class Spacers:
         if self.wormhole2:
             self.wormhole2.draw(self.screen)
 
-        if self.npc:
-            self.npc.damage_bar(self.screen)
+        # if self.npc:
+        #     self.npc.damage_bar(self.screen)
+
+        for enemy in self.enemies:
+            if enemy:
+                enemy.damage_bar(self.screen)
 
         if self.message:
             print_text(self.screen, self.message, self.font)
@@ -256,8 +271,12 @@ class Spacers:
         if self.spaceship:
             game_objects.append(self.spaceship)
 
-        if self.npc:
-            game_objects.append(self.npc)
+        # if self.npc:
+        #     game_objects.append(self.npc)
+
+        for enemy in self.enemies:
+            if enemy:
+                game_objects.append(enemy)
 
         return game_objects
     
