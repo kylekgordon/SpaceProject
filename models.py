@@ -191,6 +191,7 @@ class Spaceship(GameObject):
         self.direction = Vector2(UP)
         self.damage = 0
         self.speed = 5
+        
 
         super().__init__(position, load_sprite(ship), Vector2(0))
 
@@ -204,6 +205,7 @@ class Spaceship(GameObject):
         if self.ACCELERATION > 1:
             self.velocity -= self.direction * self.ACCELERATION
         self.velocity += self.direction * self.ACCELERATION
+        CommsSender({"target": "broadcast", "sender": "player", "body": "accelerating"})
 
     def decelerate(self):
         self.ACCELERATION = 0.1
