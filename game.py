@@ -8,6 +8,7 @@ import pygame
 import math
 import random
 from pygame.math import Vector2
+from comms import CommsSender, CommsListener
 
 # Color library
 black = (0, 0, 0)
@@ -25,6 +26,12 @@ pygame.mixer.music.load("sounds/song21.wav")
 # Add the ships to a list
 ships = ["space_ship1", "space_ship2", "space_ship3", "space_ship4", "space_ship5", "space_ship6", "space_ship7", "space_ship8", "space_ship9", "space_ship10"]
 display_time = 1000  # Time in milliseconds to display each image
+
+def callback(ch, method, properties, body):
+        """This method gets run when a message is received. You can alter it to
+        do whatever is necessary.
+        """
+    print(body)
 
 class Spacers:
     MIN_ASTEROID_DISTANCE = 250

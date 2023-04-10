@@ -173,6 +173,12 @@ class GameObject:
         return distance < self.radius + other_obj.radius
 
 
+def callback(ch, method, properties, body):
+        """This method gets run when a message is received. You can alter it to
+        do whatever is necessary.
+        """
+    print(body)
+
 class Spaceship(GameObject):
     MANEUVERABILITY = 3
     ACCELERATION = 0
@@ -250,7 +256,7 @@ class NPC(Spaceship):
 
     def shoot(self):
         self.countShootTime += 0.016
-        if self.countShootTime >= 3:
+        if self.countShootTime >= 3 and self.target:
             self.countShootTime = 0
             angle = self.direction.angle_to(UP)
             bullet_velocity = self.direction * self.BULLET_SPEED/2 + self.velocity
