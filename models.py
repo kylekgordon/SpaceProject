@@ -217,10 +217,10 @@ class NPC(Spaceship):
             self.create_bullet_callback(bullet)
             self.laser_sound.play()
 
-    def damage_bar(self):
+    def damage_bar(self, screen):
         pygame.draw.rect(screen, (255, 0, 0), (self.position.x - 50, self.position.y - 60, 100, 10))
         pygame.draw.rect(screen, (0, 255, 0), (self.position.x - 50, self.position.y - 60, 100 - self.damage, 10))
-        
+        #screen.blit(current_image, (self.position.x - 50, self.position.y - 60))
 
     def remove(self):
         pass
@@ -334,7 +334,7 @@ class Wormhole2(GameObject):
         # wormhole = pygame.transform.scale(wormhole, (200, 150))
         # screen.blit(wormhole, position)
 
-    def drawHole(self,pos):
+    def drawHole(self, pos):
         global current_image_2
         current_image_path = Portal2_paths[current_image_2]
         current_image_surface = pygame.image.load(current_image_path)

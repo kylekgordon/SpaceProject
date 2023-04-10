@@ -47,7 +47,7 @@ class Spacers:
         self.bullets = []
         self.blackholes = []
         self.spaceship = Spaceship((400, 300), self.bullets.append)
-        self.wormhole = Wormhole2(self.screen)
+        self.wormhole2 = Wormhole2(self.screen)
         self.damage_bar = Damage_bar(self.background)
         # self.npc = []
         # self.npc.append(NPC(
@@ -136,22 +136,27 @@ class Spacers:
 
         if self.spaceship:
             self.damage_bar.update(self.spaceship.damage)
-            self.explode
-            for asteroid in self.asteroids:
-                #print(asteroid)
-                if asteroid.collides_with(self.spaceship):
-                    self.hit.play()
-                    self.spaceship.damage += 10
-                    self.damage_bar.update(self.spaceship.damage)
-                    self.asteroids.remove(asteroid)
-                    asteroid.split()
-                    if self.spaceship.damage == 100:
+            if self.spaceship.damage >= 100:
+                    self.spaceship = None
+                    self.explosion.play()
+                    self.message = "You lost!"
+            if self.spaceship is not None:
+                for asteroid in self.asteroids:
+                    #print(asteroid)
+                    if self.spaceship.collides_with(asteroid):
+                        self.hit.play()
+                        self.spaceship.damage += 10
+                        #self.damage_bar.update(self.spaceship.damage)
+                        self.asteroids.remove(asteroid)
+                        asteroid.split()
+                        break
+
+                    elif self.spaceship.damage >= 100:
                         self.explode.update(self.spaceship.position)
                         self.spaceship = None
                         self.explosion.play()
                         self.message = "You lost!"
-                    #self.message = "You lost!"
-                    break
+                #self.message = "You lost!"
 
             # for wormhole in self.blackholes:
             #     if time_elapse == 0:
@@ -160,49 +165,45 @@ class Spacers:
             #             self.damage_bar.update(self.spaceship.damage)
 
             #         break
-
-        # for enemy in self.npc:
-        #     enemy.choose_target()
-        #     enemy.follow_target()
-        #     for asteroid in self.asteroids:
-        #         if asteroid.collides_with(enemy):
-        #             self.npc.remove(enemy)
-        #             break
                 
         if self.npc:
             self.npc.choose_target()
             self.npc.follow_target()
             self.npc.shoot()
-            self.npc.damage_bar()
-            for asteroid in self.asteroids:
-                #print(asteroid)
-                if asteroid.collides_with(self.npc):
-                    self.hit.play()
-                    self.npc.damage += 10
-                    #pygame.draw.rect(self.background, red, (10, 10, self.spaceship.damage, 10))
-                    #self.damage_bar.update(self.spaceship.damage)
-                    self.asteroids.remove(asteroid)
-                    asteroid.split()
-                    if self.npc.damage == 100:
+            if self.npc.damage >= 100:
+                    self.npc = None
+                    self.explosion.play()
+            if self.npc is not None:
+                for asteroid in self.asteroids:
+                    #print(asteroid)
+                    if self.npc.collides_with(asteroid):
+                        self.hit.play()
+                        self.npc.damage += 10
+                        self.asteroids.remove(asteroid)
+                        asteroid.split()
+                        break
+
+                    elif self.npc.damage >= 100:
                         self.npc = None
                         self.explosion.play()
-                        self.message = "You Won!"
-                    #self.message = "You lost!"
+                        #self.message = "You Won!"
+                
                     break
+                
         
-        if self.wormhole:
-            self.wormhole.update()
+        if self.wormhole2:
+            self.wormhole2.update()
 
         #Teleporting the spaceship
-            if self.wormhole.available:
-                if self.spaceship and self.spaceship.collides_withPos(self.wormhole,Vector2(self.wormhole.pos1.x + 40,self.wormhole.pos1.y +40)):
-                    self.spaceship.position = Vector2(self.wormhole.pos2.x + 40 - 32,self.wormhole.pos2.y + 40 - 32)
+            if self.wormhole2.available:
+                if self.spaceship and self.spaceship.collides_withPos(self.wormhole2,Vector2(self.wormhole2.pos1.x + 40,self.wormhole2.pos1.y +40)):
+                    self.spaceship.position = Vector2(self.wormhole2.pos2.x + 40 - 32,self.wormhole2.pos2.y + 40 - 32)
                     self.spaceship.velocity = Vector2(0,0)
-                    self.wormhole.available = False
-                elif self.spaceship and self.spaceship.collides_withPos(self.wormhole,Vector2(self.wormhole.pos2.x + 40 ,self.wormhole.pos2.y + 40)):
-                    self.spaceship.position = Vector2(self.wormhole.pos1.x + 40 - 32,self.wormhole.pos1.y + 40 - 32)
+                    self.wormhole2.available = False
+                elif self.spaceship and self.spaceship.collides_withPos(self.wormhole2,Vector2(self.wormhole2.pos2.x + 40 ,self.wormhole2.pos2.y + 40)):
+                    self.spaceship.position = Vector2(self.wormhole2.pos1.x + 40 - 32,self.wormhole2.pos1.y + 40 - 32)
                     self.spaceship.velocity = Vector2(0, 0)
-                    self.wormhole.available = False
+                    self.wormhole2.available = False
 
         for bullet in self.bullets[:]:
             for asteroid in self.asteroids[:]:
@@ -217,7 +218,8 @@ class Spacers:
                 self.bullets.remove(bullet)
 
             if bullet.belongTo == "player" and bullet.collides_with(self.npc):
-                self.npc = None
+                self.npc.damage += 5
+                self.hit.play()
                 self.bullets.remove(bullet)
                 break
 
@@ -236,8 +238,11 @@ class Spacers:
             #print(game_object)
             game_object.draw(self.screen)
 
-        if self.wormhole:
-            self.wormhole.draw(self.screen)
+        if self.wormhole2:
+            self.wormhole2.draw(self.screen)
+
+        if self.npc:
+            self.npc.damage_bar(self.screen)
 
         if self.message:
             print_text(self.screen, self.message, self.font)
