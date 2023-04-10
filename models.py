@@ -7,6 +7,13 @@ import random
 from utils import get_random_velocity, load_sound, load_sprite, wrap_position, distance
 import math
 
+from rich import print
+from threading import Thread
+
+# necessary libs for rabbitmq
+from comms import CommsListener
+from comms import CommsSender
+
 UP = Vector2(0, -1)
 
 # Color library
@@ -107,6 +114,40 @@ bullet = random.randrange(10, 66, 1)
 
 current_image_1 = 0
 current_image_2 = 0
+
+class Messenger:
+    def __init__(self, creds, callback=None):
+        self.creds = creds
+        self.callBack = callback
+
+        if not self.creds:
+            print(
+                "Error: Message handler needs `creds` or credentials to log into rabbitmq. "
+            )
+            sys.exit()
+
+        if not self.callBack:
+            print(
+                "Error: Message handler needs a `callBack` function to handle responses from rabbitmq. "
+            )
+            sys.exit()
+
+        self.user = self.creds["user"]
+
+        # create instances of a comms listener and sender
+        # to handle message passing.
+        self.commsListener = CommsListener(**self.creds)
+        self.commsSender = CommsSender(**self.creds)
+
+        # Start the comms listener to listen for incoming messages
+        self.commsListener.threadedListen(self.callBack)
+
+    def send(self, **kwargs):
+        """ """
+        target = kwargs.get("target", "broadcast")
+        self.commsSender.threadedSend(
+            target=target, sender=self.user, body=json.dumps(kwargs), debug=False
+        )
 
 class GameObject:
     def __init__(self, position, sprite, velocity):
