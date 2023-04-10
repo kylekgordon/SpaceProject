@@ -20,7 +20,7 @@ green = (0, 255, 0)
 ships = ["space_ship1", "space_ship2", "space_ship3", "space_ship4", "space_ship5", "space_ship6", "space_ship7", "space_ship8", "space_ship9", "space_ship10"]
 
 # Animate images in a list of images
-image_paths = ["sprites/Portal/portal01.png", "sprites/Portal/portal02.png",
+Portal1_paths = ["sprites/Portal/portal01.png", "sprites/Portal/portal02.png",
                      "sprites/Portal/portal03.png", "sprites/Portal/portal04.png",
                      "sprites/Portal/portal05.png", "sprites/Portal/portal06.png",
                      "sprites/Portal/portal07.png", "sprites/Portal/portal08.png",
@@ -53,6 +53,39 @@ image_paths = ["sprites/Portal/portal01.png", "sprites/Portal/portal02.png",
                      "sprites/Portal/portal61.png", "sprites/Portal/portal62.png",
                      "sprites/Portal/portal63.png", "sprites/Portal/portal64.png"]
 
+Portal2_paths = ["sprites/Portal2/portal01.png", "sprites/Portal2/portal02.png",
+                    "sprites/Portal2/portal03.png", "sprites/Portal2/portal04.png",
+                    "sprites/Portal2/portal05.png", "sprites/Portal2/portal06.png",
+                    "sprites/Portal2/portal07.png", "sprites/Portal2/portal08.png",
+                    "sprites/Portal2/portal09.png", "sprites/Portal2/portal10.png",
+                    "sprites/Portal2/portal11.png", "sprites/Portal2/portal12.png",
+                    "sprites/Portal2/portal13.png", "sprites/Portal2/portal14.png",
+                    "sprites/Portal2/portal15.png", "sprites/Portal2/portal16.png",
+                    "sprites/Portal2/portal17.png", "sprites/Portal2/portal18.png",
+                    "sprites/Portal2/portal19.png", "sprites/Portal2/portal20.png",
+                    "sprites/Portal2/portal21.png", "sprites/Portal2/portal22.png",
+                    "sprites/Portal2/portal23.png", "sprites/Portal2/portal24.png",
+                    "sprites/Portal2/portal25.png", "sprites/Portal2/portal26.png",
+                    "sprites/Portal2/portal27.png", "sprites/Portal2/portal28.png",
+                    "sprites/Portal2/portal29.png", "sprites/Portal2/portal30.png",
+                    "sprites/Portal2/portal31.png", "sprites/Portal2/portal32.png",
+                    "sprites/Portal2/portal33.png", "sprites/Portal2/portal34.png",
+                    "sprites/Portal2/portal35.png", "sprites/Portal2/portal36.png",
+                    "sprites/Portal2/portal37.png", "sprites/Portal2/portal38.png",
+                    "sprites/Portal2/portal39.png", "sprites/Portal2/portal40.png",
+                    "sprites/Portal2/portal41.png", "sprites/Portal2/portal42.png",
+                    "sprites/Portal2/portal43.png", "sprites/Portal2/portal44.png",
+                    "sprites/Portal2/portal45.png", "sprites/Portal2/portal46.png",
+                    "sprites/Portal2/portal47.png", "sprites/Portal2/portal48.png",
+                    "sprites/Portal2/portal49.png", "sprites/Portal2/portal50.png",
+                    "sprites/Portal2/portal51.png", "sprites/Portal2/portal52.png",
+                    "sprites/Portal2/portal53.png", "sprites/Portal2/portal54.png",
+                    "sprites/Portal2/portal55.png", "sprites/Portal2/portal56.png",
+                    "sprites/Portal2/portal57.png", "sprites/Portal2/portal58.png",
+                    "sprites/Portal2/portal59.png", "sprites/Portal2/portal60.png",
+                    "sprites/Portal2/portal61.png", "sprites/Portal2/portal62.png",
+                    "sprites/Portal2/portal63.png", "sprites/Portal2/portal64.png"]
+
 explosion_paths = ["sprites/Explosion/1.png", "sprites/Explosion/2.png",
                     "sprites/Explosion/3.png", "sprites/Explosion/4.png", 
                     "sprites/Explosion/5.png", "sprites/Explosion/6.png",
@@ -72,7 +105,7 @@ explosion_paths = ["sprites/Explosion/1.png", "sprites/Explosion/2.png",
 # Choose a random bullet sprite
 bullet = random.randrange(10, 66, 1)
 
-current_image = 0
+current_image_1 = 0
 current_image_2 = 0
 
 class GameObject:
@@ -94,73 +127,9 @@ class GameObject:
         distance = self.position.distance_to(other_obj.position)
         return distance < self.radius + other_obj.radius
 
-
-# class NPCShip(pygame.sprite.Sprite):
-#     def __init__(self, x, y, target_list, projectile_group):
-#         super().__init__()
-#         self.image = pygame.image.load(
-#             "../assets/sprites/space_ship5_40x40.png.png"
-#         ).convert_alpha()
-#         self.rect = self.image.get_rect()
-#         self.rect.x = x
-#         self.rect.y = y
-#         self.speed = 2
-#         self.rotation_speed = 2
-#         self.target_list = target_list
-#         self.projectile_group = projectile_group
-#         self.target = None
-#         self.target_time = 0
-#         self.target_time_quantum = 120  # 2 seconds at 60 FPS
-#         self.shooting_delay = 60
-#         self.shooting_timer = 0
-
-#     def choose_target(self):
-#         if self.target_time >= self.target_time_quantum:
-#             if self.target_list:
-#                 self.target = random.choice(self.target_list)
-#             else:
-#                 self.target = None
-#             self.target_time = 0
-#         else:
-#             self.target_time += 1
-
-#     def follow_target(self):
-#         if self.target:
-#             direction = Vector2(
-#                 self.target.rect.x - self.rect.x, self.target.rect.y - self.rect.y
-#             )
-#             distance = direction.length()
-#             direction.normalize_ip()
-
-#             angle = math.degrees(math.atan2(direction.y, direction.x)) - 90
-#             current_angle = (
-#                 pygame.transform.rotate(self.image, self.rotation_speed)
-#                 .get_rect()
-#                 .angle
-#             )
-#             new_angle = angle - current_angle
-#             self.image = pygame.transform.rotate(self.image, new_angle)
-#             self.rect = self.image.get_rect(center=self.rect.center)
-
-#             if distance > 100:
-#                 self.rect.x += direction.x * self.speed
-#                 self.rect.y += direction.y * self.speed
-
-#     def shoot(self):
-#         if self.shooting_timer >= self.shooting_delay:
-#             if self.target:
-#                 projectile = Projectile(
-#                     self.rect.x, self.rect.y, self.target.rect.x, self.target.rect.y
-#                 )
-#                 self.projectile_group.add(projectile)
-#             self.shooting_timer = 0
-#         else:
-#             self.shooting_timer += 1
-
-#     def update(self):
-#         self.choose_target()
-#         self.follow_target()
-#         self.shoot()
+    def collides_withPos(self, other_obj,pos):
+        distance = self.position.distance_to(pos)
+        return distance < self.radius + other_obj.radius
 
 
 class Spaceship(GameObject):
@@ -203,9 +172,10 @@ class Spaceship(GameObject):
     def shoot(self):
         angle = self.direction.angle_to(UP)
         bullet_velocity = self.direction * self.BULLET_SPEED + self.velocity
-        bullet = Bullet(self.position, bullet_velocity, angle)
+        bullet = Bullet(self.position, bullet_velocity, angle, "player")
         self.create_bullet_callback(bullet)
         self.laser_sound.play()
+
 
 class NPC(Spaceship):
     def __init__(
@@ -213,9 +183,10 @@ class NPC(Spaceship):
     ):
         self.targets = targets
         self.damage = 0
-        self.speed = 0.01
+        self.speed = 0.00001
         self.image = load_sprite(ship)
         self.rect = self.image.get_rect()
+        self.countShootTime = 0
 
         super().__init__(position, create_bullet_callback, ship)
 
@@ -232,22 +203,23 @@ class NPC(Spaceship):
 
     def follow_target(self):
         if self.target:
-            self.direction = Vector2(
-                self.target.position[0] - self.position[0],
-                self.target.position[1] - self.position[1],
-            )
-            self.direction.normalize()
-            #self.velocity = self.direction * self.speed
+            self.direction = Vector2(self.target.position.x - self.position.x, self.target.position.y - self.position.y)
+            self.direction = self.direction.normalize()
+            self.velocity = Vector2(self.direction.x, self.direction.y)
 
     def shoot(self):
-        angle = self.direction.angle_to(UP)
-        bullet_velocity = self.direction * self.BULLET_SPEED + self.velocity
-        bullet = Bullet(self.position, bullet_velocity, angle)
-        self.create_bullet_callback(bullet)
-        self.laser_sound.play()
+        self.countShootTime += 0.016
+        if self.countShootTime >= 3:
+            self.countShootTime = 0
+            angle = self.direction.angle_to(UP)
+            bullet_velocity = self.direction * self.BULLET_SPEED/2 + self.velocity
+            bullet = Bullet(self.position, bullet_velocity, angle, "npc")
+            self.create_bullet_callback(bullet)
+            self.laser_sound.play()
 
     def remove(self):
         pass
+
 
 class Asteroid(GameObject):
     def __init__(self, position, create_asteroid_callback, size=3):
@@ -268,46 +240,138 @@ class Asteroid(GameObject):
                 )
                 self.create_asteroid_callback(asteroid)
 
+
 class Bullet(GameObject):
-    def __init__(self, position, velocity, angle):
+    def __init__(self, position, velocity, angle, belongTo):
         
         super().__init__(position, load_sprite(f"{bullet}"), velocity)
         #self.sprite = pygame.transform.scale(self.sprite, (30, 30))
         self.sprite = pygame.transform.rotozoom(self.sprite, angle, 0.3)
         self.radius = self.sprite.get_width() / 2
+        self.belongTo = belongTo
         
     def move(self, surface):
         self.position = self.position + self.velocity
 
-class Wormhole(GameObject):
+
+class Wormhole1(GameObject):
     
-    def __init__(self, position, screen, image_paths = image_paths):
-        
-        
+    def __init__(self, screen, image_paths = Portal1_paths):
+            
         # Load images as surfaces
         images = [pygame.image.load(path).convert_alpha() for path in image_paths]
 
         # Create sprite object and set initial image
         sprite = pygame.sprite.Sprite()
         sprite.image = images[0]
-        sprite.image = pygame.transform.scale(sprite.image, (400, 300))
-        #sprite.rect = sprite.image.get_rect()
+        self.countRandTime = 0
+        sprite.rect = sprite.image.get_rect()
+        self.countRandTime = 0
+        self.countAvailableTime = 0
+        self.available = True
 
         self.screen = screen
-        self.position = position
+        self.position = Vector2(random.randrange(0, 800 - 200), random.randrange(0, 600 - 150))
+        self.radius = 40
 
-        super().__init__(position, sprite.image, Vector2(0))
-
-    def update(self):
-        global current_image
-        current_image_path = image_paths[current_image]
+    def drawHole(self,pos):
+        global current_image_1
+        current_image_path = Portal1_paths[current_image_1]
         current_image_surface = pygame.image.load(current_image_path)
         current_image_surface = pygame.transform.scale(current_image_surface, (200, 150))
-        self.screen.blit(current_image_surface, (self.position))
+        blitPos = pos - Vector2(self.radius)
+        self.screen.blit(current_image_surface, blitPos)
 
-        current_image += 1
-        if current_image >= len(image_paths):
-            current_image = 0
+        current_image_1 += 1
+        if current_image_1 >= len(Portal1_paths):
+            current_image_1 = 0
+
+    def randomPos(self):
+        self.countRandTime = 0
+        self.position = Vector2(random.randrange(0, 800 - 200), random.randrange(0, 600 - 150))
+
+    def update(self):
+        if not self.available:
+            self.countAvailableTime += 0.5
+            if self.countAvailableTime >= 3:
+                self.countAvailableTime = 0
+                self.available = True
+                self.randomPos()
+    
+
+class Wormhole2(GameObject):
+
+    def __init__(self,  screen, image_paths = Portal2_paths):
+        # Load images as surfaces
+        images = [pygame.image.load(path).convert_alpha() for path in image_paths]
+
+        # Create sprite object and set initial image
+        sprite = pygame.sprite.Sprite()
+        sprite.image = images[0]
+        sprite.rect = sprite.image.get_rect()
+        self.countRandTime = 0
+        self.countAvailableTime = 0
+        self.available = True
+
+
+        self.screen = screen
+        self.pos1 = Vector2(random.randrange(0, 800 - 200), random.randrange(0, 600 - 150))
+        self.pos2 = Vector2(random.randrange(0, 800 - 200), random.randrange(0, 600 - 150))
+
+        while self.pos1.distance_to(self.pos2) < 300:
+            self.pos2 = Vector2(random.randrange(0, 800 - 200), random.randrange(0, 600 - 150))
+
+        self.radius = 40
+
+        # Call the superclass constructor
+        # for i in range(0, 64):
+        # wormhole = images[i]
+        # wormhole = pygame.transform.scale(wormhole, (200, 150))
+        # screen.blit(wormhole, position)
+
+    def drawHole(self,pos):
+        global current_image_2
+        current_image_path = Portal2_paths[current_image_2]
+        current_image_surface = pygame.image.load(current_image_path)
+        current_image_surface = pygame.transform.scale(current_image_surface, (200, 150))
+        blitPos = pos - Vector2(self.radius)
+        self.screen.blit(current_image_surface,blitPos)
+
+
+        current_image_2 += 1
+        if current_image_2 >= len(Portal2_paths):
+            current_image_2 = 0
+
+    def randomPos(self):
+        self.countRandTime = 0
+        self.pos1 = Vector2(random.randrange(0, 800 - 200), random.randrange(0, 600 - 150))
+        self.pos2 = Vector2(random.randrange(0, 800 - 200), random.randrange(0, 600 - 150))
+
+        while self.pos1.distance_to(self.pos2) < 300:
+            self.pos2 = Vector2(random.randrange(0, 800 - 200), random.randrange(0, 600 - 150))
+
+    def update(self):
+        if not self.available:
+            self.countAvailableTime += 0.016
+            if self.countAvailableTime >= 3:
+                self.countAvailableTime = 0
+                self.available = True
+                self.randomPos()
+
+        # self.countRandTime += 0.016
+        # if self.countRandTime >= 10:
+        #     self.randomPos()
+
+
+
+    def draw(self, surface):
+        if self.available:
+            self.drawHole(self.pos1)
+            self.drawHole(self.pos2)
+
+
+        # pass
+
 
 class Damage_bar():
     def __init__(self, surface):
@@ -316,16 +380,7 @@ class Damage_bar():
         self.damage_bar_height = 10
         self.font = pygame.font.SysFont("Arial", 15)
         self.surface = surface
-        # damage_bar_surface = pygame.Surface((width, self.damage_bar_rect.height))
-        # damage_bar_surface.fill(red)
-        #pygame.draw.rect(self.background, red, damage_bar_rect)
         
-        # damage_bar_rect.width = int(damage_bar_width - damage)
-        # pygame.draw.rect(self.background, red, damage_bar_rect)
-        #surface.blit(damage_bar_surface,(10, 10))
-        #surface.blit(surface, (10, 10))
-    # self.image = pygame.draw.rect(self.background, red, pygame.Rect(10, 10, 10 * damage, 10))
-
     def update(self, damage):
         width = self.damage_bar_width + damage
         pygame.draw.rect(self.surface, red, (10, 28, width, self.damage_bar_height))
@@ -333,6 +388,7 @@ class Damage_bar():
         damage_text = self.font.render("Damage" , True, white)
         self.surface.blit(damage_text, (10, 5))
         pygame.display.update()
+
 
 class Explosion(GameObject):
     
