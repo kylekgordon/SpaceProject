@@ -1,7 +1,8 @@
 from pygame.math import Vector2
 from pygame import transform
-
+import json
 import time
+import sys
 import pygame
 import random
 from utils import get_random_velocity, load_sound, load_sprite, wrap_position, distance
@@ -174,9 +175,10 @@ class GameObject:
 
 
 def callback(ch, method, properties, body):
-        """This method gets run when a message is received. You can alter it to
-        do whatever is necessary.
-        """
+    """This method gets run when a message is received. You can alter it to
+    do whatever is necessary.
+    """
+    #body = body.decode("utf-8")
     print(body)
 
 class Spaceship(GameObject):
@@ -205,7 +207,8 @@ class Spaceship(GameObject):
         if self.ACCELERATION > 1:
             self.velocity -= self.direction * self.ACCELERATION
         self.velocity += self.direction * self.ACCELERATION
-        CommsSender({"target": "broadcast", "sender": "player", "body": "accelerating"})
+
+        #CommsSender({"target": "broadcast", "sender": "player", "body": "accelerating"})
 
     def decelerate(self):
         self.ACCELERATION = 0.1

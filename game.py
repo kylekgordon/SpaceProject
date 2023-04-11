@@ -1,4 +1,5 @@
 import pygame
+import json
 
 from models import Asteroid, Spaceship, NPC, Wormhole1, Wormhole2, Damage_bar, Explosion
 from utils import get_random_position, load_sprite, print_text, load_sound
@@ -28,10 +29,12 @@ ships = ["space_ship1", "space_ship2", "space_ship3", "space_ship4", "space_ship
 display_time = 1000  # Time in milliseconds to display each image
 
 def callback(ch, method, properties, body):
-        """This method gets run when a message is received. You can alter it to
-        do whatever is necessary.
-        """
+    """This method gets run when a message is received. You can alter it to
+    do whatever is necessary.
+    """
+    #body = body.decode("utf-8")
     print(body)
+
 
 class Spacers:
     MIN_ASTEROID_DISTANCE = 250
@@ -102,7 +105,7 @@ class Spacers:
         
         pygame.display.set_caption("Spacers")
 
-        self.listener = CommsListener(callback)
+        # self.listener = CommsListener(callback)
 
     def _handle_input(self):
         for event in pygame.event.get():
