@@ -188,7 +188,7 @@ class Spaceship(GameObject):
 
     def __init__(self, position, create_bullet_callback, ship=random.choice(ships)):
         self.create_bullet_callback = create_bullet_callback
-        self.laser_sound = load_sound("laser")
+        self.laser_sound = load_sound("PewFire2")
         # Make a copy of the original UP vector
         self.direction = Vector2(UP)
         self.damage = 0

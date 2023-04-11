@@ -48,8 +48,10 @@ class Spacers:
         self.message = ""
 
         self.hit = load_sound("DefiniteHit")
-        self.explosion = load_sound("MiniExplosionChainReaction")
+        self.explosion = load_sound("CrashKG")
         self.taunt = load_sound("Funny-16")
+        self.spawn = load_sound("SpawnKG")
+        self.teleport = load_sound("TeleportKG")
         #self.song = pygame.mixer.music.load("sounds/song21.wav")
         pygame.mixer.music.play(-1)
         self.targets = []
@@ -96,6 +98,7 @@ class Spacers:
                 # if len(self.enemies) == 0:
                 #     self.targets.append(self.spaceship)
                 #     self.targets.append(self.npc)
+                self.spawn.play()
                 self.enemies.append(NPC((random.randrange(10, 790, 1), random.randrange(10, 790, 1)), self.bullets.append, random.choice(ships), self.targets))
                 time_elapse = 500
 
@@ -211,10 +214,12 @@ class Spacers:
                 if self.spaceship and self.spaceship.collides_withPos(self.wormhole2,Vector2(self.wormhole2.pos1.x + 40,self.wormhole2.pos1.y +40)):
                     self.spaceship.position = Vector2(self.wormhole2.pos2.x + 40 - 32,self.wormhole2.pos2.y + 40 - 32)
                     self.spaceship.velocity = Vector2(0,0)
+                    self.teleport.play()
                     self.wormhole2.available = False
                 elif self.spaceship and self.spaceship.collides_withPos(self.wormhole2,Vector2(self.wormhole2.pos2.x + 40 ,self.wormhole2.pos2.y + 40)):
                     self.spaceship.position = Vector2(self.wormhole2.pos1.x + 40 - 32,self.wormhole2.pos1.y + 40 - 32)
                     self.spaceship.velocity = Vector2(0, 0)
+                    self.teleport.play()
                     self.wormhole2.available = False
 
         for bullet in self.bullets[:]:
