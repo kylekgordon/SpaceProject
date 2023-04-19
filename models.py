@@ -200,6 +200,7 @@ class Spaceship(GameObject):
         self.damage = 0
         self.kills = 0
         self.speed = 5
+        self.ship = ship
         
         self.creds = kwargs.get("creds", None)
         self.callback = kwargs.get("callback", None)
@@ -257,20 +258,15 @@ class Spaceship(GameObject):
         self.create_bullet_callback(bullet)
         self.laser_sound.play()
 
-    def sendData(self, scoreTo=None):
+    def sendData(self):
         self.broadcastData(
             {
                 "pos": (self.position.x, self.position.y),
                 "vel": (self.velocity.x, self.velocity.y),
                 "dir": (self.direction.x, self.direction.y),
                 "shoot": False,
-                "health": self.health,
-                "destroy": self.destroy,
-                "scoreTo": scoreTo,
-                "spriteI":self.spriteI,
-                "bulletDamage": self.bulletDamage,
-                "activeBulletSkill":self.activeBulletSkill,
-                "angle": self.angle
+                "damage": self.damage,
+                "ship":self.ship
             }
         )
 
@@ -281,10 +277,7 @@ class Spaceship(GameObject):
                 "vel": (self.velocity.x, self.velocity.y),
                 "dir": (self.direction.x, self.direction.y),
                 "shoot": True,
-                "health": self.health,
-                "destroy": self.destroy,
-                "activeBulletSkill":self.activeBulletSkill,
-                "angle": self.angle
+                "damage": self.damage
             }
         )
  
@@ -482,7 +475,7 @@ class Wormhole2(GameObject):
     def update(self):
         if not self.available:
             self.countAvailableTime += 0.016
-            if self.countAvailableTime >= 3:
+            if self.countAvailableTime >= 5:
                 self.countAvailableTime = 0
                 self.available = True
                 self.randomPos()

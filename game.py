@@ -2,7 +2,7 @@ import pygame
 import json
 
 from models import Asteroid, Spaceship, NPC, Wormhole1, Wormhole2, Damage_bar, Explosion
-from utils import get_random_position, load_sprite, print_text, load_sound
+from utils import get_random_position, load_sprite, print_text, load_sound, mykwargs
 
 
 import pygame
@@ -10,6 +10,9 @@ import math
 import random
 from pygame.math import Vector2
 from comms import CommsSender, CommsListener
+from manager import commsManager
+
+from urllib.request import urlopen
 
 # Color library
 black = (0, 0, 0)
@@ -28,18 +31,39 @@ pygame.mixer.music.load("sounds/song21.wav")
 ships = ["space_ship1", "space_ship2", "space_ship3", "space_ship4", "space_ship5", "space_ship6", "space_ship7", "space_ship8", "space_ship9", "space_ship10"]
 display_time = 1000  # Time in milliseconds to display each image
 
-def callback(ch, method, properties, body):
-    """This method gets run when a message is received. You can alter it to
-    do whatever is necessary.
-    """
-    #body = body.decode("utf-8")
-    print(body)
+# def callback(ch, method, properties, body):
+#     """This method gets run when a message is received. You can alter it to
+#     do whatever is necessary.
+#     """
+#     #body = body.decode("utf-8")
+#     print(body)
 
 
 class Spacers:
     MIN_ASTEROID_DISTANCE = 250
 
     def __init__(self):
+
+        url = "https://terrywgriffin.com/current_usage.json"
+        response = urlopen(url)
+        data_json = json.loads(response.read())
+        if len(data_json['players']) >= 10:
+            print(data_json['players'])
+            print("max users exceed!")
+            exit(111)
+
+        args, kwargs = mykwargs(sys.argv)
+
+        queue = kwargs.get("queue", None)
+        playerId = kwargs.get("player", None)
+        creds = {
+            "exchange": queue,
+            "port": "5672",
+            "host": "terrywgriffin.com",
+            "user": playerId,
+            "password": playerId + "2023!!!!!",
+        }
+
         self._init_pygame()
         self.screen = pygame.display.set_mode((800, 600))
         self.background = load_sprite("BackgroundSupernovaLarge", False)
@@ -47,7 +71,7 @@ class Spacers:
         self.font = pygame.font.Font(None, 64)
         self.message = ""
 
-        self.hit = load_sound("DefiniteHit")
+        self.hit = load_sound("ExplodeKG")
         self.explosion = load_sound("CrashKG")
         self.taunt = load_sound("Funny-16")
         self.spawn = load_sound("SpawnKG")
@@ -61,10 +85,18 @@ class Spacers:
         self.spaceship = Spaceship((400, 300), self.bullets.append)
         self.wormhole2 = Wormhole1(self.screen)
         self.wormhole3 = Wormhole2(self.screen)
-        self.damage_bar = Damage_bar(self.background)
+        self.damage_bar = Damage_bar(self.screen)
         self.explode = Explosion(self.spaceship.position, self.background, [self.spaceship])
         self.npc = NPC((random.randrange(10, 790, 1), random.randrange(10, 790, 1)), self.bullets.append, random.choice(ships), self.targets)
         self.enemies = []
+
+        self.manager = commsManager(self.bullets.append)
+        localSpaceShip = Spaceship((400,400),None,None,self.bullets.append,
+           id=playerId,creds=creds, callback=self.manager.callBack)
+        
+        self.manager.addPlayer(None,None,player=localSpaceShip, localPlayer=True)
+
+
         # Griffin changed this to 1 so it would only generate 1 asteroid :)
         for _ in range(2):
             while True:
@@ -194,13 +226,14 @@ class Spacers:
                 self.wormhole2.update()
                 
                 #Teleporting the spaceship
-                if self.wormhole2.available:
+                if self.wormhole3.available:
                     if self.spaceship and self.spaceship.collides_withPos(self.wormhole2,Vector2(self.wormhole2.pos1.x + 40, self.wormhole2.pos1.y + 40)):
                         self.wormhole2.available = False
                         self.spaceship.position = Vector2(self.wormhole3.pos2.x + 40 - 32,self.wormhole3.pos2.y + 40 - 32)
                         self.spaceship.velocity = Vector2(0,0)
                         self.teleport.play()
-                        
+
+                if self.wormhole2.available:
                     if self.spaceship and self.spaceship.collides_withPos(self.wormhole3,Vector2(self.wormhole3.pos2.x + 40 ,self.wormhole3.pos2.y + 40)):
                         self.wormhole3.available = False
                         self.spaceship.position = Vector2(self.wormhole2.pos1.x + 40 - 32,self.wormhole2.pos1.y + 40 - 32)
@@ -259,8 +292,10 @@ class Spacers:
         if self.wormhole3:
             self.wormhole3.draw(self.screen)
 
-        # if self.npc:
-        #     self.npc.damage_bar(self.screen)
+        if self.damage_bar:
+            self.damage_bar
+        else:
+            self.damage_bar.update(100, self.spaceship.kills)
 
         for enemy in self.enemies:
             if enemy:
