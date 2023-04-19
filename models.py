@@ -258,6 +258,9 @@ class Spaceship(GameObject):
         self.create_bullet_callback(bullet)
         self.laser_sound.play()
 
+    def brake(self):
+        self.velocity = [0, 0]
+
     def sendData(self):
         self.broadcastData(
             {

@@ -1,5 +1,6 @@
 import pygame
 import json
+import sys
 
 from models import Asteroid, Spaceship, NPC, Wormhole1, Wormhole2, Damage_bar, Explosion
 from utils import get_random_position, load_sprite, print_text, load_sound, mykwargs
@@ -161,14 +162,19 @@ class Spacers:
         if self.spaceship:
             if is_key_pressed[pygame.K_RIGHT]:
                 self.spaceship.rotate(clockwise=True)
+                self.spaceship.sendData()
             if is_key_pressed[pygame.K_LEFT]:
                 self.spaceship.rotate(clockwise=False)
+                self.spaceship.sendData()
             if is_key_pressed[pygame.K_UP]:
                 self.spaceship.accelerate()
+                self.spaceship.sendData()
             if is_key_pressed[pygame.K_DOWN]:
                 self.spaceship.decelerate()
+                self.spaceship.sendData()
             if is_key_pressed[pygame.K_b]:
-                self.spaceship.velocity = Vector2(0, 0)
+                self.spaceship.brake()
+                self.spaceship.sendData()
                 
 
     def _process_game_logic(self):
