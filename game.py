@@ -145,7 +145,7 @@ class Spacers:
             game_object.move(self.screen)
 
         if self.spaceship:
-            self.damage_bar.update(self.spaceship.damage)
+            self.damage_bar.update(self.spaceship.damage, self.spaceship.kills)
             if self.spaceship.damage >= 100:
                     self.spaceship = None
                     self.explosion.play()
@@ -174,6 +174,7 @@ class Spacers:
             if len(self.enemies) > 0:
                 if enemy.damage >= 100:
                     self.enemies.remove(enemy)
+                    self.spaceship.kills += 1
                     self.explosion.play()
                 if len(self.enemies) > 0:
                     for asteroid in self.asteroids:

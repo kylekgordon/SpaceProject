@@ -198,6 +198,7 @@ class Spaceship(GameObject):
         # Make a copy of the original UP vector
         self.direction = Vector2(UP)
         self.damage = 0
+        self.kills = 0
         self.speed = 5
         
         self.creds = kwargs.get("creds", None)
@@ -508,12 +509,14 @@ class Damage_bar():
         self.font = pygame.font.SysFont("Arial", 15)
         self.surface = surface
         
-    def update(self, damage):
+    def update(self, damage, kills):
         width = self.damage_bar_width + damage
         pygame.draw.rect(self.surface, red, (10, 28, width, self.damage_bar_height))
         pygame.draw.rect(self.surface, white, (10, 28, 100, self.damage_bar_height), 2)
         damage_text = self.font.render("Damage" , True, white)
+        kills_text = self.font.render("Kills: {}".format(kills), True, white)
         self.surface.blit(damage_text, (10, 5))
+        self.surface.blit(kills_text, (10, 40))
         pygame.display.update()
 
 
