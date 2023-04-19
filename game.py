@@ -59,7 +59,8 @@ class Spacers:
         self.bullets = []
         self.blackholes = []
         self.spaceship = Spaceship((400, 300), self.bullets.append)
-        self.wormhole2 = Wormhole2(self.screen)
+        self.wormhole2 = Wormhole1(self.screen)
+        self.wormhole3 = Wormhole2(self.screen)
         self.damage_bar = Damage_bar(self.background)
         self.explode = Explosion(self.spaceship.position, self.background, [self.spaceship])
         self.npc = NPC((random.randrange(10, 790, 1), random.randrange(10, 790, 1)), self.bullets.append, random.choice(ships), self.targets)
@@ -134,6 +135,9 @@ class Spacers:
                 self.spaceship.accelerate()
             if is_key_pressed[pygame.K_DOWN]:
                 self.spaceship.decelerate()
+            if is_key_pressed[pygame.K_b]:
+                self.spaceship.velocity = Vector2(0, 0)
+                
 
     def _process_game_logic(self):
 
@@ -183,44 +187,26 @@ class Spacers:
                         #     self.enemies.remove(enemy)
                         #     self.explosion.play()
                 
-        # if self.npc:
-        #     self.npc.choose_target()
-        #     self.npc.follow_target()
-        #     self.npc.shoot()
-        #     if self.npc.damage >= 100:
-        #             self.npc = None
-        #             self.explosion.play()
-        #     if self.npc is not None:
-        #         for asteroid in self.asteroids:
-        #             if self.npc.collides_with(asteroid):
-        #                 self.hit.play()
-        #                 self.npc.damage += 10
-        #                 self.asteroids.remove(asteroid)
-        #                 asteroid.split()
-        #                 break
-
-        #             elif self.npc.damage >= 100:
-        #                 self.npc = None
-        #                 self.explosion.play()
+        if self.wormhole3:
+            self.wormhole3.update()
+            if self.wormhole2:
+                self.wormhole2.update()
                 
-        #             break
-                
-        
-        if self.wormhole2:
-            self.wormhole2.update()
+                #Teleporting the spaceship
+                if self.wormhole2.available:
+                    if self.spaceship and self.spaceship.collides_withPos(self.wormhole2,Vector2(self.wormhole2.pos1.x + 40, self.wormhole2.pos1.y + 40)):
+                        self.wormhole2.available = False
+                        self.spaceship.position = Vector2(self.wormhole3.pos2.x + 40 - 32,self.wormhole3.pos2.y + 40 - 32)
+                        self.spaceship.velocity = Vector2(0,0)
+                        self.teleport.play()
+                        
+                    if self.spaceship and self.spaceship.collides_withPos(self.wormhole3,Vector2(self.wormhole3.pos2.x + 40 ,self.wormhole3.pos2.y + 40)):
+                        self.wormhole3.available = False
+                        self.spaceship.position = Vector2(self.wormhole2.pos1.x + 40 - 32,self.wormhole2.pos1.y + 40 - 32)
+                        self.spaceship.velocity = Vector2(0, 0)
+                        self.teleport.play()
+                        
 
-        #Teleporting the spaceship
-            if self.wormhole2.available:
-                if self.spaceship and self.spaceship.collides_withPos(self.wormhole2,Vector2(self.wormhole2.pos1.x + 40,self.wormhole2.pos1.y +40)):
-                    self.spaceship.position = Vector2(self.wormhole2.pos2.x + 40 - 32,self.wormhole2.pos2.y + 40 - 32)
-                    self.spaceship.velocity = Vector2(0,0)
-                    self.teleport.play()
-                    self.wormhole2.available = False
-                elif self.spaceship and self.spaceship.collides_withPos(self.wormhole2,Vector2(self.wormhole2.pos2.x + 40 ,self.wormhole2.pos2.y + 40)):
-                    self.spaceship.position = Vector2(self.wormhole2.pos1.x + 40 - 32,self.wormhole2.pos1.y + 40 - 32)
-                    self.spaceship.velocity = Vector2(0, 0)
-                    self.teleport.play()
-                    self.wormhole2.available = False
 
         for bullet in self.bullets[:]:
             for asteroid in self.asteroids[:]:
@@ -268,6 +254,9 @@ class Spacers:
 
         if self.wormhole2:
             self.wormhole2.draw(self.screen)
+
+        if self.wormhole3:
+            self.wormhole3.draw(self.screen)
 
         # if self.npc:
         #     self.npc.damage_bar(self.screen)

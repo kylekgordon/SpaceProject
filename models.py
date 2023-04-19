@@ -10,7 +10,6 @@ import math
 
 from rich import print
 from threading import Thread
-
 # necessary libs for rabbitmq
 from comms import CommsListener
 from comms import CommsSender
@@ -110,6 +109,7 @@ explosion_paths = ["sprites/Explosion/1.png", "sprites/Explosion/2.png",
                     "sprites/Explosion/27.png", "sprites/Explosion/28.png",
                     "sprites/Explosion/29.png", "sprites/Explosion/30.png"]
 
+
 # Choose a random bullet sprite
 bullet = random.randrange(10, 66, 1)
 
@@ -117,6 +117,11 @@ current_image_1 = 0
 current_image_2 = 0
 
 class Messenger:
+    """
+    - Handles messaging (sending and receiving) for each player.
+    - Requires a callback to be passed in so received messages can be handled.
+    """
+
     def __init__(self, creds, callback=None):
         self.creds = creds
         self.callBack = callback
@@ -133,6 +138,7 @@ class Messenger:
             )
             sys.exit()
 
+        # Identify the user
         self.user = self.creds["user"]
 
         # create instances of a comms listener and sender
@@ -144,7 +150,7 @@ class Messenger:
         self.commsListener.threadedListen(self.callBack)
 
     def send(self, **kwargs):
-        """ """
+        """Sends the message to a target or broadcasts to all."""
         target = kwargs.get("target", "broadcast")
         self.commsSender.threadedSend(
             target=target, sender=self.user, body=json.dumps(kwargs), debug=False
@@ -186,7 +192,7 @@ class Spaceship(GameObject):
     ACCELERATION = 0
     BULLET_SPEED = 10
 
-    def __init__(self, position, create_bullet_callback, ship=random.choice(ships)):
+    def __init__(self, position, create_bullet_callback, ship=random.choice(ships), **kwargs):
         self.create_bullet_callback = create_bullet_callback
         self.laser_sound = load_sound("PewFire2")
         # Make a copy of the original UP vector
@@ -194,8 +200,30 @@ class Spaceship(GameObject):
         self.damage = 0
         self.speed = 5
         
+        self.creds = kwargs.get("creds", None)
+        self.callback = kwargs.get("callback", None)
+        self.id = kwargs.get("id", None)
+        if self.creds is not None:
+            self.messenger = Messenger(self.creds, self.callback)
+        self.lastBroadcast = pygame.time.get_ticks()
+        self.broadCastDelay = 0
 
         super().__init__(position, load_sprite(ship), Vector2(0))
+
+    def timeToBroadCast(self):
+        """check to see if there was enough delay to broadcast again"""
+        return pygame.time.get_ticks() - self.lastBroadcast > self.broadCastDelay
+
+    def broadcastData(self, data):
+        if self.timeToBroadCast():
+            self.messenger.send(
+                target="broadcast", sender=self.id, player=self.id, data=data
+            )
+            self.lastBroadcast = pygame.time.get_ticks()
+            return True
+
+        return False
+
 
     def rotate(self, clockwise=True):
         sign = 1 if clockwise else -1
@@ -228,6 +256,37 @@ class Spaceship(GameObject):
         self.create_bullet_callback(bullet)
         self.laser_sound.play()
 
+    def sendData(self, scoreTo=None):
+        self.broadcastData(
+            {
+                "pos": (self.position.x, self.position.y),
+                "vel": (self.velocity.x, self.velocity.y),
+                "dir": (self.direction.x, self.direction.y),
+                "shoot": False,
+                "health": self.health,
+                "destroy": self.destroy,
+                "scoreTo": scoreTo,
+                "spriteI":self.spriteI,
+                "bulletDamage": self.bulletDamage,
+                "activeBulletSkill":self.activeBulletSkill,
+                "angle": self.angle
+            }
+        )
+
+    def sendShoot(self):
+        self.broadcastData(
+            {
+                "pos": (self.position.x, self.position.y),
+                "vel": (self.velocity.x, self.velocity.y),
+                "dir": (self.direction.x, self.direction.y),
+                "shoot": True,
+                "health": self.health,
+                "destroy": self.destroy,
+                "activeBulletSkill":self.activeBulletSkill,
+                "angle": self.angle
+            }
+        )
+ 
 
 class NPC(Spaceship):
     def __init__(
@@ -312,32 +371,40 @@ class Bullet(GameObject):
 
 
 class Wormhole1(GameObject):
-    
-    def __init__(self, screen, image_paths = Portal1_paths):
-            
+
+    def __init__(self,  screen, image_paths = Portal1_paths):
         # Load images as surfaces
         images = [pygame.image.load(path).convert_alpha() for path in image_paths]
 
         # Create sprite object and set initial image
         sprite = pygame.sprite.Sprite()
         sprite.image = images[0]
-        self.countRandTime = 0
         sprite.rect = sprite.image.get_rect()
         self.countRandTime = 0
         self.countAvailableTime = 0
         self.available = True
 
+
         self.screen = screen
-        self.position = Vector2(random.randrange(0, 800 - 200), random.randrange(0, 600 - 150))
+        
+        self.pos1 = Vector2(random.randrange(0, 400), random.randrange(0, 450))
+
         self.radius = 40
 
-    def drawHole(self,pos):
+        # Call the superclass constructor
+        # for i in range(0, 64):
+        # wormhole = images[i]
+        # wormhole = pygame.transform.scale(wormhole, (200, 150))
+        # screen.blit(wormhole, position)
+
+    def drawHole(self, pos):
         global current_image_1
         current_image_path = Portal1_paths[current_image_1]
         current_image_surface = pygame.image.load(current_image_path)
         current_image_surface = pygame.transform.scale(current_image_surface, (200, 150))
         blitPos = pos - Vector2(self.radius)
-        self.screen.blit(current_image_surface, blitPos)
+        self.screen.blit(current_image_surface,blitPos)
+
 
         current_image_1 += 1
         if current_image_1 >= len(Portal1_paths):
@@ -345,15 +412,26 @@ class Wormhole1(GameObject):
 
     def randomPos(self):
         self.countRandTime = 0
-        self.position = Vector2(random.randrange(0, 800 - 200), random.randrange(0, 600 - 150))
+        self.pos1 = Vector2(random.randrange(0, 800 - 400), random.randrange(0, 600 - 150))
 
     def update(self):
         if not self.available:
-            self.countAvailableTime += 0.5
+            self.countAvailableTime += 0.016
             if self.countAvailableTime >= 3:
                 self.countAvailableTime = 0
                 self.available = True
                 self.randomPos()
+
+        self.countRandTime += 0.016
+        if self.countRandTime >= 10:
+            self.randomPos()
+
+    def draw(self, surface):
+        if self.available:
+            self.drawHole(self.pos1)
+
+
+        # pass
     
 
 class Wormhole2(GameObject):
@@ -372,11 +450,8 @@ class Wormhole2(GameObject):
 
 
         self.screen = screen
-        self.pos1 = Vector2(random.randrange(0, 800 - 200), random.randrange(0, 600 - 150))
-        self.pos2 = Vector2(random.randrange(0, 800 - 200), random.randrange(0, 600 - 150))
-
-        while self.pos1.distance_to(self.pos2) < 300:
-            self.pos2 = Vector2(random.randrange(0, 800 - 200), random.randrange(0, 600 - 150))
+        
+        self.pos2 = Vector2(random.randrange(400, 600), random.randrange(0, 450))
 
         self.radius = 40
 
@@ -401,11 +476,7 @@ class Wormhole2(GameObject):
 
     def randomPos(self):
         self.countRandTime = 0
-        self.pos1 = Vector2(random.randrange(0, 800 - 200), random.randrange(0, 600 - 150))
-        self.pos2 = Vector2(random.randrange(0, 800 - 200), random.randrange(0, 600 - 150))
-
-        while self.pos1.distance_to(self.pos2) < 300:
-            self.pos2 = Vector2(random.randrange(0, 800 - 200), random.randrange(0, 600 - 150))
+        self.pos2 = Vector2(random.randrange(400, 800 - 200), random.randrange(0, 600 - 150))
 
     def update(self):
         if not self.available:
@@ -423,7 +494,6 @@ class Wormhole2(GameObject):
 
     def draw(self, surface):
         if self.available:
-            self.drawHole(self.pos1)
             self.drawHole(self.pos2)
 
 
