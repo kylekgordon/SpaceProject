@@ -7,6 +7,7 @@ import pygame
 import random
 from utils import get_random_velocity, load_sound, load_sprite, wrap_position, distance
 import math
+import os
 
 from rich import print
 from threading import Thread
@@ -113,6 +114,7 @@ explosion_paths = ["sprites/Explosion/1.png", "sprites/Explosion/2.png",
 # Choose a random bullet sprite
 bullet = random.randrange(10, 66, 1)
 
+current_image = 0
 current_image_1 = 0
 current_image_2 = 0
 
@@ -192,15 +194,22 @@ class Spaceship(GameObject):
     ACCELERATION = 0
     BULLET_SPEED = 10
 
-    def __init__(self, position, create_bullet_callback, ship=random.choice(ships), **kwargs):
+    def __init__(self, position, create_bullet_callback, ship, **kwargs):
         self.create_bullet_callback = create_bullet_callback
         self.laser_sound = load_sound("PewFire2")
+        self.explode_sound = load_sound("CrashKG")
         # Make a copy of the original UP vector
         self.direction = Vector2(UP)
         self.damage = 0
         self.kills = 0
         self.speed = 5
-        self.ship = ship
+        self.destroyed = False
+
+        if ship == None:
+            self.ship = random.choice(ships)
+        
+        else:
+            self.ship = ship
         
         self.creds = kwargs.get("creds", None)
         self.callback = kwargs.get("callback", None)
@@ -210,7 +219,7 @@ class Spaceship(GameObject):
         self.lastBroadcast = pygame.time.get_ticks()
         self.broadCastDelay = 0
 
-        super().__init__(position, load_sprite(ship), Vector2(0))
+        super().__init__(position, load_sprite(self.ship), Vector2(0))
 
     def timeToBroadCast(self):
         """check to see if there was enough delay to broadcast again"""
@@ -265,11 +274,13 @@ class Spaceship(GameObject):
         self.broadcastData(
             {
                 "pos": (self.position.x, self.position.y),
-                "vel": (self.velocity.x, self.velocity.y),
+                "vel": (self.velocity[0], self.velocity[1]),
                 "dir": (self.direction.x, self.direction.y),
                 "shoot": False,
                 "damage": self.damage,
-                "ship":self.ship
+                "destroyed": self.destroyed,
+                "ship":self.ship,
+                "kills":self.kills
             }
         )
 
@@ -280,9 +291,24 @@ class Spaceship(GameObject):
                 "vel": (self.velocity.x, self.velocity.y),
                 "dir": (self.direction.x, self.direction.y),
                 "shoot": True,
-                "damage": self.damage
+                "damage": self.damage,
+                "destroyed": self.destroyed
             }
         )
+
+    def explode(self, screen):
+        global current_image
+        self.damage = 100
+        current_image_path = explosion_paths[current_image]
+        current_image_surface = pygame.image.load(current_image_path)
+        current_image_surface = pygame.transform.scale(current_image_surface, (200, 150))
+        screen.blit(current_image_surface, self.position)
+        self.destroyed = True
+        self.explode_sound.play()
+
+        current_image += 1
+        if current_image >= len(explosion_paths):
+            current_image = 0
  
 
 class NPC(Spaceship):

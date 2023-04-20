@@ -1,5 +1,5 @@
 import pygame
-import json
+from rich import json
 import sys
 
 from models import Asteroid, Spaceship, NPC, Wormhole1, Wormhole2, Damage_bar, Explosion
@@ -44,7 +44,9 @@ class Spacers:
     MIN_ASTEROID_DISTANCE = 250
 
     def __init__(self):
-
+        """
+        To Run: py/python __main__.py game-01 player-01
+        """
         url = "https://terrywgriffin.com/current_usage.json"
         response = urlopen(url)
         data_json = json.loads(response.read())
@@ -83,21 +85,20 @@ class Spacers:
         self.asteroids = []
         self.bullets = []
         self.blackholes = []
-        self.spaceship = Spaceship((400, 300), self.bullets.append)
+  
         self.wormhole2 = Wormhole1(self.screen)
         self.wormhole3 = Wormhole2(self.screen)
         self.damage_bar = Damage_bar(self.screen)
-        self.explode = Explosion(self.spaceship.position, self.background, [self.spaceship])
         self.npc = NPC((random.randrange(10, 790, 1), random.randrange(10, 790, 1)), self.bullets.append, random.choice(ships), self.targets)
         self.enemies = []
 
         self.manager = commsManager(self.bullets.append)
-        localSpaceShip = Spaceship((400,400),None,None,self.bullets.append,
-           id=playerId,creds=creds, callback=self.manager.callBack)
+        localSpaceShip = Spaceship((400,300),self.bullets.append, None,
+           id=playerId,creds=creds, callback= self.manager.callBack)
         
-        self.manager.addPlayer(None,None,player=localSpaceShip, localPlayer=True)
+        self.manager.addPlayer(None, player=localSpaceShip, localPlayer=True)
 
-
+        self.spaceship = localSpaceShip
         # Griffin changed this to 1 so it would only generate 1 asteroid :)
         for _ in range(2):
             while True:
@@ -202,7 +203,8 @@ class Spacers:
                     elif self.spaceship.damage >= 100:
                         self.explode.update(self.spaceship.position)
                         self.spaceship = None
-                        self.explosion.play()
+                        self.spaceship.explode(self.screen)
+                        # self.explosion.play()
                         self.message = "You lost!"
 
         for enemy in self.enemies:

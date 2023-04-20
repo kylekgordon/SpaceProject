@@ -23,13 +23,13 @@ class commsManager:
         self.localPlayer = None
         self.sprites = pygame.sprite.Group()
 
-    def addPlayer(self,spriteI,bulletSpriteI, **kwargs):
+    def addPlayer(self, ship, **kwargs):
         """Adds a player to the local game as dictated by incoming messages."""
         name = kwargs.get("name", None)
         player = kwargs.get("player", None)
         localPlayer = kwargs.get("localPlayer", False)
 
-        # we don't want to try and manage the local player instance
+        # Instances of players are created in two ways:
         if localPlayer:
             self.localPlayer = player.id
             self.spaceShip = player
@@ -37,7 +37,7 @@ class commsManager:
             # this is a new player that needs just a basic player class
             # with no messaging capabilites. This is a mirror of another
             # player somewhere else.
-            player = Spaceship((400,400),spriteI,bulletSpriteI,self.create_bullet_callback,id=name)
+            player = Spaceship((400,300),self.create_bullet_callback, ship,id=name)
             self.players[name] = player
 
     def update(self,screen):
@@ -45,7 +45,7 @@ class commsManager:
             player.move(screen)
 
         for id, player in self.players.items():
-            if player.destroy:
+            if player.destroyed:
                 self.players.pop(id)
                 break
 
@@ -67,18 +67,10 @@ class commsManager:
         vel = data.get("vel", None)
         dir = data.get("dir", None)
         shoot = data.get("shoot", False)
-        health = data.get("health", None)
-        destroy = data.get("destroy", None)
-        scoreTo = data.get("scoreTo", None)
-        score = data.get("score", None)
-        angle = data.get("angle",None)
-
-        spriteI = data.get("spriteI", None)
-        bulletSpriteI = data.get("bulletSpriteI", None)
-
-        bulletDamage = data.get("bulletDamage", None)
-
-        activeBulletSkill = data.get("activeBulletSkill",None)
+        damage = data.get("damage", None)
+        destroyed = data.get("destroyed", None)
+        kills = data.get("kills", None)
+        ship = data.get("ship", None)
 
         # if scoreTo is not None:
         #     print(scoreTo)
@@ -87,7 +79,7 @@ class commsManager:
         if self.localPlayer != sender:
             #print(f"not local: {sender} != {self.localPlayer}")
             if not sender in self.players:
-                self.addPlayer(spriteI,bulletSpriteI,name=sender)
+                self.addPlayer(ship,name=sender)
                 print(f"Players: {len(self.players)}")
             else:
                 if xy:
@@ -99,10 +91,6 @@ class commsManager:
                 if dir:
                     self.players[sender].direction.x = dir[0]
                     self.players[sender].direction.y = dir[1]
-                if activeBulletSkill:
-                    self.players[sender].activeBulletSkill = self.players[sender].activeBulletSkill
-                if angle:
-                    self.players[sender].angle = angle
                 if shoot is True:
                     self.players[sender].shoot(self.players[sender].angle)
                     if self.players[sender].activeBulletSkill:
