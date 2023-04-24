@@ -20,11 +20,9 @@ class Messenger:
             )
             sys.exit()
 
-        if not self.callBack:
-            print(
-                "Error: Message handler needs a `callBack` function to handle responses from rabbitmq. "
-            )
-            sys.exit()
+        if self.callBack != None:
+            # Start the comms listener to listen for incoming messages
+            self.commsListener.threadedListen(self.callBack)
 
         # Identify the user
         self.user = self.creds["user"]
@@ -43,3 +41,12 @@ class Messenger:
         self.commsSender.threadedSend(
             target=target, sender=self.user, body=json.dumps(kwargs), debug=False
         )
+
+    def setCallback(self, callBack):
+        """
+        sets the callback function for the messenger
+        Args:
+            callBack : 
+        """
+        self.callBack = callBack
+        self.commsListener.threadedListen(self.callBack)
