@@ -187,11 +187,18 @@ class Spacers:
                 self.spaceship.brake()
                 self.spaceship.sendData()
                 
-
     def _process_game_logic(self):
+
+        self.manager.update(self.screen)
 
         for game_object in self._get_game_objects():
             game_object.move(self.screen)
+
+        for id, player in self.manager.players.items():
+            for bullet in self.bullets:
+                if bullet.collides_with(player):
+                    self.bullets.remove(bullet)
+                    break
 
         if self.spaceship:
             self.damage_bar.update(self.spaceship.damage, self.spaceship.kills)
@@ -306,6 +313,8 @@ class Spacers:
     def _draw(self):
         global time_elapse
         self.screen.blit(self.background, (0,0))
+
+        self.manager.draw(self.screen)
         for game_object in self._get_game_objects():
             #print(game_object)
             game_object.draw(self.screen)

@@ -34,9 +34,7 @@ class commsManager:
             self.localPlayer = player.id
             self.spaceShip = player
         else:
-            # this is a new player that needs just a basic player class
-            # with no messaging capabilites. This is a mirror of another
-            # player somewhere else.
+            # This is a mirror of another player somewhere else.
             player = Spaceship((400,300),self.create_bullet_callback, ship,id=name)
             self.players[name] = player
 
@@ -98,6 +96,12 @@ class commsManager:
                         self.players[sender].shoot(self.players[sender].angle + 5)
                 if damage:
                     self.players[sender].damage = damage
+
+                if destroyed:
+                    self.players[sender].destroyed = destroyed
+
+                if kills:
+                    self.players[sender].kills = kills
 
         else:
             # print("local player")
