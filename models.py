@@ -25,7 +25,10 @@ blue = (0, 0, 255)
 green = (0, 255, 0)
 
 # Add the ships to a list
-ships = ["space_ship1", "space_ship2", "space_ship3", "space_ship4", "space_ship5", "space_ship6", "space_ship7", "space_ship8", "space_ship9", "space_ship10"]
+ships = ["space_ship1", "space_ship2", "space_ship3", 
+         "space_ship4", "space_ship5", "space_ship6", 
+         "space_ship7", "space_ship8", "space_ship9", 
+         "space_ship10"]
 
 # Animate images in a list of images
 Portal1_paths = ["sprites/Portal/portal01.png", "sprites/Portal/portal02.png",
@@ -182,12 +185,12 @@ class GameObject:
         return distance < self.radius + other_obj.radius
 
 
-def callback(ch, method, properties, body):
-    """This method gets run when a message is received. You can alter it to
-    do whatever is necessary.
-    """
-    #body = body.decode("utf-8")
-    print(body)
+# def callback(ch, method, properties, body):
+#     """This method gets run when a message is received. You can alter it to
+#     do whatever is necessary.
+#     """
+#     #body = body.decode("utf-8")
+#     print(body)
 
 class Spaceship(GameObject):
     MANEUVERABILITY = 3
@@ -574,3 +577,22 @@ class Explosion(GameObject):
         current_image_2 += 1
         if current_image_2 >= len(explosion_paths):
             current_image_2 = 0
+
+class Barrel(GameObject):
+    def __init__(self, position, create_barrel_callback, size=3):
+        self.create_barrel_callback = create_barrel_callback
+        self.size = size
+
+        size_to_scale = {3: 0.01, 2: 0.001, 1: 0.0005}
+        scale = size_to_scale[size]
+        sprite = transform.rotozoom(load_sprite("Barrel"), 0, scale)
+
+        super().__init__(position, sprite, get_random_velocity(1, 2))
+
+    def split(self):
+        if self.size > 1:
+            for _ in range(2):
+                barrel = Barrel(
+                    self.position, self.create_barrel_callback, self.size - 1
+                )
+                self.create_barrel_callback(barrel)

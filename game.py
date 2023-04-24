@@ -2,7 +2,7 @@ import pygame
 from rich import json
 import sys
 
-from models import Asteroid, Spaceship, NPC, Wormhole1, Wormhole2, Damage_bar, Explosion
+from models import Asteroid, Spaceship, NPC, Wormhole1, Wormhole2, Damage_bar, Barrel
 from utils import get_random_position, load_sprite, print_text, load_sound, mykwargs
 
 
@@ -29,7 +29,10 @@ pygame.mixer.init()
 pygame.mixer.music.load("sounds/song21.wav")
 
 # Add the ships to a list
-ships = ["space_ship1", "space_ship2", "space_ship3", "space_ship4", "space_ship5", "space_ship6", "space_ship7", "space_ship8", "space_ship9", "space_ship10"]
+ships = ["space_ship1", "space_ship2", "space_ship3", 
+         "space_ship4", "space_ship5", "space_ship6", 
+         "space_ship7", "space_ship8", "space_ship9", 
+         "space_ship10"]
 display_time = 1000  # Time in milliseconds to display each image
 
 # def callback(ch, method, properties, body):
@@ -85,6 +88,7 @@ class Spacers:
         self.asteroids = []
         self.bullets = []
         self.blackholes = []
+        self.barrels = []
   
         self.wormhole2 = Wormhole1(self.screen)
         self.wormhole3 = Wormhole2(self.screen)
@@ -111,8 +115,8 @@ class Spacers:
 
             self.asteroids.append(Asteroid(position, self.asteroids.append))
         
-        # if len(self.blackholes) == 0:
-        #     self.blackholes.append(Wormhole1(self.screen))
+        if len(self.barrels) == 0:
+            self.barrels.append(Barrel((random.randrange(10, 790, 1), random.randrange(10, 790, 1)), self.barrels.append))
 
         if len(self.enemies) == 0:
             #self.targets.append(self.npc)
@@ -121,6 +125,7 @@ class Spacers:
 
     def main_loop(self, status):
         global time_elapse
+        health_spawn = 500
         running = status
         while running:
             self._handle_input()
@@ -128,6 +133,7 @@ class Spacers:
             self._draw()
         
             time_elapse -= 1
+            health_spawn -= 1
 
             if time_elapse == 0 and self.message != "You Won!" and self.message != "You lost!":
                 # if len(self.enemies) == 0:
@@ -136,6 +142,10 @@ class Spacers:
                 self.spawn.play()
                 self.enemies.append(NPC((random.randrange(10, 790, 1), random.randrange(10, 790, 1)), self.bullets.append, random.choice(ships), self.targets))
                 time_elapse = 500
+
+            if health_spawn == 0:
+                self.barrels.append(Barrel((random.randrange(10, 790, 1), random.randrange(10, 790, 1)), self.barrels.append))
+                health_spawn = 1000
 
     def _init_pygame(self):
 
@@ -188,6 +198,7 @@ class Spacers:
             if self.spaceship.damage >= 100:
                     self.spaceship = None
                     self.explosion.play()
+                    # self.spaceship.destroyed = True
                     self.message = "You lost!"
             if self.spaceship is not None:
                 for asteroid in self.asteroids:
@@ -204,7 +215,7 @@ class Spacers:
                         self.explode.update(self.spaceship.position)
                         self.spaceship = None
                         self.spaceship.explode(self.screen)
-                        # self.explosion.play()
+                        # self.spaceship.destroyed = True
                         self.message = "You lost!"
 
         for enemy in self.enemies:
@@ -248,7 +259,12 @@ class Spacers:
                         self.spaceship.velocity = Vector2(0, 0)
                         self.teleport.play()
                         
-
+        for barrel in self.barrels:
+            if self.spaceship and self.spaceship.collides_with(barrel):
+                self.spaceship.damage -= 10
+                self.barrels.remove(barrel)
+                # self.health.play()
+                break
 
         for bullet in self.bullets[:]:
             for asteroid in self.asteroids[:]:
@@ -316,7 +332,7 @@ class Spacers:
         self.clock.tick(60)
 
     def _get_game_objects(self):
-        game_objects = [*self.asteroids, *self.bullets]
+        game_objects = [*self.asteroids, *self.bullets, *self.barrels]
 
         if self.spaceship:
             game_objects.append(self.spaceship)
