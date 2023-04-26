@@ -103,8 +103,11 @@ class Spacers:
         self.manager.addPlayer(None, None, player=localSpaceShip, localPlayer=True)
 
         self.spaceship = localSpaceShip
-        # Griffin changed this to 1 so it would only generate 1 asteroid :)
-        for _ in range(2):
+        
+        # Changed this to 1 so it would only generate 1 asteroid :)
+        Asteroids = 2
+
+        for _ in range(Asteroids):
             while True:
                 position = get_random_position(self.screen)
                 if (
@@ -210,7 +213,8 @@ class Spacers:
                     #print(asteroid)
                     if self.spaceship.collides_with(asteroid):
                         self.hit.play()
-                        self.spaceship.damage += 10
+                        # self.spaceship.damage += 10
+                        self.spaceship.hit()
                         #self.damage_bar.update(self.spaceship.damage)
                         self.asteroids.remove(asteroid)
                         asteroid.split()
@@ -281,8 +285,8 @@ class Spacers:
 
         for bullet in self.bullets[:]:
             if bullet.collides_with(self.spaceship) and bullet.id != self.spaceship.id:
-                self.spaceship.damage -= 10
-                # self.spaceship.sendData(scoreTo=bullet.id)
+                self.spaceship.hit()
+                self.spaceship.sendData()
                 self.bullets.remove(bullet)
                 break
 
@@ -335,6 +339,9 @@ class Spacers:
             self.damage_bar
         else:
             self.damage_bar.update(100, self.spaceship.kills)
+
+        # if self.spaceship:
+        #     self.spaceship.damage_bar(self.screen)
 
         for enemy in self.enemies:
             if enemy:

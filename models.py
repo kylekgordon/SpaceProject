@@ -315,6 +315,16 @@ class Spaceship(GameObject):
         current_image += 1
         if current_image >= len(explosion_paths):
             current_image = 0
+
+    def hit(self):
+        self.damage += 10
+        if self.damage >= 100:
+            self.damage = 100
+            # self.explode()
+
+    def damage_bar(self, screen):
+        pygame.draw.rect(screen, (red), (self.position.x - 50, self.position.y - 60, 100, 10))
+        pygame.draw.rect(screen, (green), (self.position.x - 50, self.position.y - 60, 100 - self.damage, 10))
  
 
 class NPC(Spaceship):
@@ -353,13 +363,13 @@ class NPC(Spaceship):
             self.countShootTime = 0
             angle = self.direction.angle_to(UP)
             bullet_velocity = self.direction * self.BULLET_SPEED/2 + self.velocity
-            bullet = Bullet(self.position, bullet_velocity, angle, "npc")
+            bullet = Bullet(self.position, bullet_velocity, None, angle, "npc")
             self.create_bullet_callback(bullet)
             self.laser_sound.play()
 
-    def damage_bar(self, screen):
-        pygame.draw.rect(screen, (red), (self.position.x - 50, self.position.y - 60, 100, 10))
-        pygame.draw.rect(screen, (green), (self.position.x - 50, self.position.y - 60, 100 - self.damage, 10))
+    # def damage_bar(self, screen):
+    #     pygame.draw.rect(screen, (green), (self.position.x - 50, self.position.y - 60, 100, 5))
+    #     pygame.draw.rect(screen, (red), (self.position.x - 50, self.position.y - 60, 0 + self.damage, 5))
         #screen.blit(current_image, (self.position.x - 50, self.position.y - 60))
 
     def remove(self):
@@ -421,12 +431,6 @@ class Wormhole1(GameObject):
 
         self.radius = 40
 
-        # Call the superclass constructor
-        # for i in range(0, 64):
-        # wormhole = images[i]
-        # wormhole = pygame.transform.scale(wormhole, (200, 150))
-        # screen.blit(wormhole, position)
-
     def drawHole(self, pos):
         global current_image_1
         current_image_path = Portal1_paths[current_image_1]
@@ -485,12 +489,6 @@ class Wormhole2(GameObject):
 
         self.radius = 40
 
-        # Call the superclass constructor
-        # for i in range(0, 64):
-        # wormhole = images[i]
-        # wormhole = pygame.transform.scale(wormhole, (200, 150))
-        # screen.blit(wormhole, position)
-
     def drawHole(self, pos):
         global current_image_2
         current_image_path = Portal2_paths[current_image_2]
@@ -516,9 +514,9 @@ class Wormhole2(GameObject):
                 self.available = True
                 self.randomPos()
 
-        # self.countRandTime += 0.016
-        # if self.countRandTime >= 10:
-        #     self.randomPos()
+        self.countRandTime += 0.016
+        if self.countRandTime >= 10:
+            self.randomPos()
 
 
 

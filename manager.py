@@ -95,7 +95,6 @@ class commsManager:
                     self.players[sender].shoot()
                 if damage:
                     self.players[sender].damage = damage
-
                 if destroyed:
                     self.players[sender].destroyed = destroyed
 
