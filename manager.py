@@ -23,7 +23,7 @@ class commsManager:
         self.localPlayer = None
         self.sprites = pygame.sprite.Group()
 
-    def addPlayer(self, ship, **kwargs):
+    def addPlayer(self, ship, bullet, **kwargs):
         """Adds a player to the local game as dictated by incoming messages."""
         name = kwargs.get("name", None)
         player = kwargs.get("player", None)
@@ -35,7 +35,7 @@ class commsManager:
             self.spaceShip = player
         else:
             # This is a mirror of another player somewhere else.
-            player = Spaceship((400,300),self.create_bullet_callback, ship,id=name)
+            player = Spaceship((400,300),self.create_bullet_callback, ship, bullet, id=name)
             self.players[name] = player
 
     def update(self,screen):
@@ -69,6 +69,8 @@ class commsManager:
         destroyed = data.get("destroyed", None)
         kills = data.get("kills", None)
         ship = data.get("ship", None)
+        bullet = data.get("bullet", None)
+
 
         # if scoreTo is not None:
         #     print(scoreTo)
@@ -77,7 +79,7 @@ class commsManager:
         if self.localPlayer != sender:
             #print(f"not local: {sender} != {self.localPlayer}")
             if not sender in self.players:
-                self.addPlayer(ship,name=sender)
+                self.addPlayer(ship, bullet, name=sender)
                 print(f"Players: {len(self.players)}")
             else:
                 if xy:
@@ -91,9 +93,6 @@ class commsManager:
                     self.players[sender].direction.y = dir[1]
                 if shoot is True:
                     self.players[sender].shoot()
-                    if self.players[sender].activeBulletSkill:
-                        self.players[sender].shoot()
-                        # self.players[sender].shoot()
                 if damage:
                     self.players[sender].damage = damage
 

@@ -97,10 +97,10 @@ class Spacers:
         self.enemies = []
 
         self.manager = commsManager(self.bullets.append)
-        localSpaceShip = Spaceship((400,300),self.bullets.append, None,
+        localSpaceShip = Spaceship((400,300),self.bullets.append, None, None,
            id=playerId,creds=creds, callback= self.manager.callBack)
         
-        self.manager.addPlayer(None, player=localSpaceShip, localPlayer=True)
+        self.manager.addPlayer(None, None, player=localSpaceShip, localPlayer=True)
 
         self.spaceship = localSpaceShip
         # Griffin changed this to 1 so it would only generate 1 asteroid :)
@@ -150,10 +150,7 @@ class Spacers:
     def _init_pygame(self):
 
         pygame.init()
-        
         pygame.display.set_caption("Spacers")
-
-        # self.listener = CommsListener(callback)
 
     def _handle_input(self):
         for event in pygame.event.get():
@@ -197,7 +194,7 @@ class Spacers:
 
         for id, player in self.manager.players.items():
             for bullet in self.bullets:
-                if bullet.collides_with(player):
+                if bullet.collides_with(player) and bullet.id != id:
                     self.bullets.remove(bullet)
                     break
 
@@ -281,6 +278,13 @@ class Spacers:
                     self.bullets.remove(bullet)
                     asteroid.split()
                     break
+
+        for bullet in self.bullets[:]:
+            if bullet.collides_with(self.spaceship) and bullet.id != self.spaceship.id:
+                self.spaceship.damage -= 10
+                # self.spaceship.sendData(scoreTo=bullet.id)
+                self.bullets.remove(bullet)
+                break
 
         for bullet in self.bullets[:]:
             if not self.screen.get_rect().collidepoint(bullet.position):

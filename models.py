@@ -197,7 +197,7 @@ class Spaceship(GameObject):
     ACCELERATION = 0
     BULLET_SPEED = 10
 
-    def __init__(self, position, create_bullet_callback, ship, **kwargs):
+    def __init__(self, position, create_bullet_callback, ship, bullet, **kwargs):
         self.create_bullet_callback = create_bullet_callback
         self.laser_sound = load_sound("PewFire2")
         self.explode_sound = load_sound("CrashKG")
@@ -210,9 +210,11 @@ class Spaceship(GameObject):
 
         if ship == None:
             self.ship = random.choice(ships)
+            self.bullet = f"sprites/{bullet}.png"
         
         else:
             self.ship = ship
+            self.bullet = bullet
         
         self.creds = kwargs.get("creds", None)
         self.callback = kwargs.get("callback", None)
@@ -266,8 +268,8 @@ class Spaceship(GameObject):
     def shoot(self):
         angle = self.direction.angle_to(UP)
         bullet_velocity = self.direction * self.BULLET_SPEED + self.velocity
-        bullet = Bullet(self.position, bullet_velocity, angle, "player")
-        self.create_bullet_callback(bullet)
+        bullets = Bullet(self.position, bullet_velocity, self.id, angle, "player")
+        self.create_bullet_callback(bullets)
         self.laser_sound.play()
 
     def brake(self):
@@ -283,6 +285,7 @@ class Spaceship(GameObject):
                 "damage": self.damage,
                 "destroyed": self.destroyed,
                 "ship":self.ship,
+                "bullet":self.bullet,
                 "kills":self.kills
             }
         )
@@ -316,7 +319,7 @@ class Spaceship(GameObject):
 
 class NPC(Spaceship):
     def __init__(
-        self, position, create_bullet_callback, ship=random.choice(ships), targets=[]
+        self, position, create_bullet_callback, ship=random.choice(ships), bullet = f"sprites/{bullet}.png" , targets=[]
     ):
         self.targets = targets
         self.damage = 0
@@ -325,7 +328,7 @@ class NPC(Spaceship):
         self.rect = self.image.get_rect()
         self.countShootTime = 0
 
-        super().__init__(position, create_bullet_callback, ship)
+        super().__init__(position, create_bullet_callback, ship, bullet)
 
     def choose_target(self):
         closestDistance = pow(2, 20)
@@ -384,13 +387,13 @@ class Asteroid(GameObject):
 
 
 class Bullet(GameObject):
-    def __init__(self, position, velocity, angle, belongTo):
+    def __init__(self, position, velocity, id, angle, belongTo):
         
         super().__init__(position, load_sprite(f"{bullet}"), velocity)
         #self.sprite = pygame.transform.scale(self.sprite, (30, 30))
         self.sprite = pygame.transform.rotozoom(self.sprite, angle, 0.3)
         self.radius = self.sprite.get_width() / 2
-        # self.id = id
+        self.id = id
         self.belongTo = belongTo
         
     def move(self, surface):
