@@ -390,6 +390,7 @@ class Bullet(GameObject):
         #self.sprite = pygame.transform.scale(self.sprite, (30, 30))
         self.sprite = pygame.transform.rotozoom(self.sprite, angle, 0.3)
         self.radius = self.sprite.get_width() / 2
+        # self.id = id
         self.belongTo = belongTo
         
     def move(self, surface):
@@ -577,6 +578,7 @@ class Explosion(GameObject):
         current_image_2 += 1
         if current_image_2 >= len(explosion_paths):
             current_image_2 = 0
+
 
 class Barrel(GameObject):
     def __init__(self, position, create_barrel_callback, size=3):

@@ -90,10 +90,10 @@ class commsManager:
                     self.players[sender].direction.x = dir[0]
                     self.players[sender].direction.y = dir[1]
                 if shoot is True:
-                    self.players[sender].shoot(self.players[sender].angle)
+                    self.players[sender].shoot()
                     if self.players[sender].activeBulletSkill:
-                        self.players[sender].shoot(self.players[sender].angle - 5)
-                        self.players[sender].shoot(self.players[sender].angle + 5)
+                        self.players[sender].shoot()
+                        # self.players[sender].shoot()
                 if damage:
                     self.players[sender].damage = damage
 
