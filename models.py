@@ -291,7 +291,7 @@ class Spaceship(GameObject):
         self.broadcastData(
             {
                 "pos": (self.position.x, self.position.y),
-                "vel": (self.velocity.x, self.velocity.y),
+                "vel": (self.velocity[0], self.velocity[1]),
                 "dir": (self.direction.x, self.direction.y),
                 "shoot": True,
                 "damage": self.damage,
