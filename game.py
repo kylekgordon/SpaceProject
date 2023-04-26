@@ -122,7 +122,6 @@ class Spacers:
             self.barrels.append(Barrel((random.randrange(10, 790, 1), random.randrange(10, 790, 1)), self.barrels.append))
 
         if len(self.enemies) == 0:
-            #self.targets.append(self.npc)
             self.targets.append(self.spaceship)
             self.enemies.append(NPC((random.randrange(10, 790, 1), random.randrange(10, 790, 1)), self.bullets.append, random.choice(ships), self.targets))
 
@@ -139,8 +138,8 @@ class Spacers:
             health_spawn -= 1
 
             if time_elapse == 0 and self.message != "You Won!" and self.message != "You lost!":
-                # if len(self.enemies) == 0:
-                #     self.targets.append(self.spaceship)
+                if len(self.targets) == 0:
+                    self.targets.append(self.spaceship)
                 #     self.targets.append(self.npc)
                 self.spawn.play()
                 # self.enemies.append(NPC((random.randrange(10, 790, 1), random.randrange(10, 790, 1)), self.bullets.append, random.choice(ships), self.targets))
@@ -340,8 +339,8 @@ class Spacers:
         else:
             self.damage_bar.update(100, self.spaceship.kills)
 
-        # if self.spaceship:
-        #     self.spaceship.damage_bar(self.screen)
+        if self.spaceship:
+            self.spaceship.damage_bar(self.screen)
 
         for enemy in self.enemies:
             if enemy:
