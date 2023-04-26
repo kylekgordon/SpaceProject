@@ -140,7 +140,7 @@ class Spacers:
                 #     self.targets.append(self.spaceship)
                 #     self.targets.append(self.npc)
                 self.spawn.play()
-                self.enemies.append(NPC((random.randrange(10, 790, 1), random.randrange(10, 790, 1)), self.bullets.append, random.choice(ships), self.targets))
+                # self.enemies.append(NPC((random.randrange(10, 790, 1), random.randrange(10, 790, 1)), self.bullets.append, random.choice(ships), self.targets))
                 time_elapse = 500
 
             if health_spawn == 0:
