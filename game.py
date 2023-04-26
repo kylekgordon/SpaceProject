@@ -167,6 +167,7 @@ class Spacers:
                 and event.key == pygame.K_SPACE
             ):
                 self.spaceship.shoot()
+                self.spaceship.sendShoot()
 
         is_key_pressed = pygame.key.get_pressed()
 
@@ -305,7 +306,8 @@ class Spacers:
                     break
 
         if len(self.enemies) == 0:
-            self.message = "You Won!"
+            # self.message = "You Won!"
+            pass
 
         # if not self.npc and self.spaceship:
         #     self.message = "You won!"
