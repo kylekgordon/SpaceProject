@@ -205,7 +205,7 @@ class Spacers:
             if self.spaceship.damage >= 100:
                     self.spaceship = None
                     self.explosion.play()
-                    # self.spaceship.destroyed = True
+                    self.spaceship.destroyed = True
                     self.message = "You lost!"
             if self.spaceship is not None:
                 for asteroid in self.asteroids:

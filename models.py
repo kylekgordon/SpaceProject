@@ -161,6 +161,15 @@ class Messenger:
             target=target, sender=self.user, body=json.dumps(kwargs), debug=False
         )
 
+    def setCallback(self, callBack):
+        """
+        sets the callback function for the messenger
+        Args:
+            callBack : 
+        """
+        self.callBack = callBack
+        self.commsListener.threadedListen(self.callBack)
+
 class GameObject:
     def __init__(self, position, sprite, velocity):
         self.position = Vector2(position)
@@ -219,6 +228,7 @@ class Spaceship(GameObject):
         self.creds = kwargs.get("creds", None)
         self.callback = kwargs.get("callback", None)
         self.id = kwargs.get("id", None)
+
         if self.creds is not None:
             self.messenger = Messenger(self.creds, self.callback)
         self.lastBroadcast = pygame.time.get_ticks()
@@ -323,8 +333,8 @@ class Spaceship(GameObject):
             # self.explode()
 
     def damage_bar(self, screen):
-        pygame.draw.rect(screen, (red), (self.position.x - 50, self.position.y - 60, 100, 10))
-        pygame.draw.rect(screen, (green), (self.position.x - 50, self.position.y - 60, 100 - self.damage, 10))
+        pygame.draw.rect(screen, (red), (self.position.x - 25, self.position.y - 60, 50, 5))
+        pygame.draw.rect(screen, (green), (self.position.x - 25, self.position.y - 60, 50 - (self.damage/2), 5))
  
 
 class NPC(Spaceship):
@@ -368,8 +378,8 @@ class NPC(Spaceship):
             self.laser_sound.play()
 
     def damage_bar(self, screen):
-        pygame.draw.rect(screen, (red), (self.position.x - 50, self.position.y - 60, 100, 10))
-        pygame.draw.rect(screen, (green), (self.position.x - 50, self.position.y - 60, 100 - self.damage, 10))
+        pygame.draw.rect(screen, (red), (self.position.x - 25, self.position.y - 60, 50, 5))
+        pygame.draw.rect(screen, (green), (self.position.x - 25, self.position.y - 60, 50 - (self.damage/2), 5))
         #screen.blit(current_image, (self.position.x - 50, self.position.y - 60))
 
     def remove(self):
