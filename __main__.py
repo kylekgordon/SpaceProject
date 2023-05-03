@@ -1,6 +1,7 @@
-from game import Spacers
+from gameselect import selectGame
 
 
 if __name__ == "__main__":
-    spacers = Spacers()
-    spacers.main_loop(True)
+    selectGame()
+    # spacers = Spacers()
+    # spacers.main_loop(True)
