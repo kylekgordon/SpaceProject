@@ -201,7 +201,7 @@ class Spacers:
                     break
 
         if self.spaceship:
-            self.damage_bar.update(self.spaceship.damage, self.spaceship.kills)
+            # self.damage_bar.update(self.spaceship.damage, self.spaceship.kills)
             if self.spaceship.damage >= 100:
                     self.spaceship = None
                     self.explosion.play()

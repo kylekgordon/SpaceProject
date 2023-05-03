@@ -235,12 +235,6 @@ class Spacers:
             if not self.screen.get_rect().collidepoint(bullet.position):
                 self.bullets.remove(bullet)
 
-            # if bullet.belongTo == "player" and bullet.collides_with(self.npc):
-            #     self.npc.damage += 5
-            #     self.hit.play()
-            #     self.bullets.remove(bullet)
-            #     break
-
             if self.spaceship and bullet.belongTo == "npc" and bullet.collides_with(self.spaceship):
                 self.spaceship.damage += 5
                 self.hit.play()
